@@ -6,32 +6,32 @@ const getState = ({ getStore, getActions, setStore }) => {
             error: null, // Centralized error handling
             menu: [
                 { id: "1",
-                  title: "Poio", 
-                  image: "https://img.hellofresh.com/w_3840,q_auto,f_auto..." 
+                  title: "Asado con fritas", 
+                  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQiEQ890osGJJyWJMpnez8pfzchfN3c8gr2Uw&s"
                 },
                 { 
                   id: "2", 
-                  title: "Milanga", 
-                  image: "https://img.hellofresh.com/w_3840,q_auto,f_auto..." 
+                  title: "Strogonof", 
+                  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgbNX6ux-vMGoRAgShXxqk_j08gF3bXFEA6A&s"
                 },
                 { 
                   id: "3", 
-                  title: "Poio", 
-                  image: "https://img.hellofresh.com/w_3840,q_auto,f_auto..." 
+                  title: "Pollo con pure", 
+                  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJ_iDo5qKKqcdjOWVXJpciiAqWfEL7-NDZpg&s"
                 },
                 { id: "4", 
-                  title: "Milanga", 
-                  image: "https://img.hellofresh.com/w_3840,q_auto,f_auto..." 
+                  title: "Canelones", 
+                  image: "https://www.clarin.com/2021/06/04/y8kPKKxo5_1200x630__1.jpg"
                 },
                 { 
                   id: "5", 
-                  title: "Poio", 
-                  image: "https://img.hellofresh.com/w_3840,q_auto,f_auto..." 
+                  title: "Pastel de carne", 
+                  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrK367qwCujJALJf4dnDBWnHLDrfGF74ISfg&s"
                 },
                 { 
                   id: "6", 
-                  title: "Milanga", 
-                  image: "https://img.hellofresh.com/w_3840,q_auto,f_auto..." 
+                  title: "Paella", 
+                  image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRe4bMr-rKcGqbXvrqrZm2a5gPW8oPvxIg8og&s"
                 }
             ]
         },
