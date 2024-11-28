@@ -20,7 +20,7 @@ export const Navbar = () => {
                     {/* Conditionally render buttons */}
                     {!isLoggedIn ? (
                         <Link to="/login">
-                            <button className="btn btn-primary">Login!</button>
+                            <button className="btn btn-light">Login</button>
                         </Link>
                     ) : (
                         <Link to="/">

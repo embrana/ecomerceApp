@@ -2,47 +2,69 @@ const getState = ({ getStore, getActions, setStore }) => {
     return {
         store: {
             message: null,
-            token: null, // Add token to the store
+            token: sessionStorage.getItem("auth_token") || null, // Initialize token from sessionStorage
+            error: null, // Centralized error handling
             menu: [
-                {
-					id: "1",
-                    title: "Poio",
-                    image: "https://img.hellofresh.com/w_3840,q_auto,f_auto,c_fill,fl_lossy/hellofresh_website/es/cms/SEO/recipes/albondigas-caseras-de-cerdo-con-salsa-barbacoa.jpeg",
+                { id: "1",
+                  title: "Poio", 
+                  image: "https://img.hellofresh.com/w_3840,q_auto,f_auto..." 
                 },
-                {
-                    id: "2",
-                    title: "Milanga",
-                    image: "https://img.hellofresh.com/w_3840,q_auto,f_auto,c_fill,fl_lossy/hellofresh_website/es/cms/SEO/recipes/albondigas-caseras-de-cerdo-con-salsa-barbacoa.jpeg",
+                { 
+                  id: "2", 
+                  title: "Milanga", 
+                  image: "https://img.hellofresh.com/w_3840,q_auto,f_auto..." 
                 },
-				{
-					id: "3",
-                    title: "Poio",
-                    image: "https://img.hellofresh.com/w_3840,q_auto,f_auto,c_fill,fl_lossy/hellofresh_website/es/cms/SEO/recipes/albondigas-caseras-de-cerdo-con-salsa-barbacoa.jpeg",
+                { 
+                  id: "3", 
+                  title: "Poio", 
+                  image: "https://img.hellofresh.com/w_3840,q_auto,f_auto..." 
                 },
-                {
-                    id: "4",
-                    title: "Milanga",
-                    image: "https://img.hellofresh.com/w_3840,q_auto,f_auto,c_fill,fl_lossy/hellofresh_website/es/cms/SEO/recipes/albondigas-caseras-de-cerdo-con-salsa-barbacoa.jpeg",
+                { id: "4", 
+                  title: "Milanga", 
+                  image: "https://img.hellofresh.com/w_3840,q_auto,f_auto..." 
                 },
-				{
-					id: "5",
-                    title: "Poio",
-                    image: "https://img.hellofresh.com/w_3840,q_auto,f_auto,c_fill,fl_lossy/hellofresh_website/es/cms/SEO/recipes/albondigas-caseras-de-cerdo-con-salsa-barbacoa.jpeg",
+                { 
+                  id: "5", 
+                  title: "Poio", 
+                  image: "https://img.hellofresh.com/w_3840,q_auto,f_auto..." 
                 },
-                {
-                    id: "6",
-                    title: "Milanga",
-                    image: "https://img.hellofresh.com/w_3840,q_auto,f_auto,c_fill,fl_lossy/hellofresh_website/es/cms/SEO/recipes/albondigas-caseras-de-cerdo-con-salsa-barbacoa.jpeg",
+                { 
+                  id: "6", 
+                  title: "Milanga", 
+                  image: "https://img.hellofresh.com/w_3840,q_auto,f_auto..." 
                 }
             ]
         },
         actions: {
-            // Example function
-            exampleFunction: () => {
-                getActions().changeColor(0, "green");
-            },
+            login: async (email, password) => {
+                try {
+                    const response = await fetch(process.env.BACKEND_URL + "/api/login", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email, password })
+                    });
 
-            // Get message from backend
+                    const data = await response.json();
+                    if (response.ok) {
+                        sessionStorage.setItem("auth_token", data.token);
+                        setStore({ token: data.token, error: null });
+                        return true;
+                    } else {
+                        setStore({ error: data.msg || "Login failed!" });
+                        return false;
+                    }
+                } catch (error) {
+                    setStore({ error: "An error occurred during login." });
+                    return false;
+                }
+            },
+            logout: () => {
+                sessionStorage.removeItem("auth_token");
+                setStore({ token: null });
+            },
+            clearError: () => {
+                setStore({ error: null });
+            },
             getMessage: async () => {
                 try {
                     const resp = await fetch(process.env.BACKEND_URL + "/api/hello");
@@ -50,60 +72,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                     setStore({ message: data.message });
                     return data;
                 } catch (error) {
-                    console.log("Error loading message from backend", error);
+                    console.error("Error loading message from backend", error);
                 }
-            },
-
-            // Change color for demo array
-            changeColor: (index, color) => {
-                const store = getStore();
-                const demo = store.demo.map((elm, i) => {
-                    if (i === index) elm.background = color;
-                    return elm;
-                });
-                setStore({ demo: demo });
-            },
-
-            // Login action to handle user login and set the token in the store
-            login: async (email, password) => {
-				const payload = { email, password };
-				try {
-					const response = await fetch(process.env.BACKEND_URL + "/api/login", {
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json"
-						},
-						body: JSON.stringify(payload)
-					});
-					const data = await response.json();
-					console.log(data);
-			
-					if (response.ok) {
-						// On success, store the JWT token in Flux store
-						setStore({ token: data.token });
-			
-						// Store the token in sessionStorage for persistence across page reloads
-						sessionStorage.setItem('auth_token', data.token);
-						
-						return true; // Return true for successful login
-					} else {
-						console.error(data.msg || "Login failed!");
-						setStore({ error: data.msg || "Login failed!" }); // Store the error message
-						return false; // Return false for failed login
-					}
-				} catch (error) {
-					console.error("An error occurred:", error);
-					setStore({ error: "An error occurred during login." }); // Store the error message
-					return false; // Return false for failed login
-				}
-			},
-			logout: () => {
-                // Clear token from store
-                setStore({ token: null });
-                // Remove token from sessionStorage
-                sessionStorage.removeItem("auth_token");
             }
-			
         }
     };
 };
