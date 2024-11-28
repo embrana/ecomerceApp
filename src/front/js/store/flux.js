@@ -76,7 +76,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 					setStore({ error: "An error occurred during login." }); // Store the error message
 					return false; // Return false for failed login
 				}
-			}
+			},
+			logout: () => {
+                // Clear token from store
+                setStore({ token: null });
+                // Remove token from sessionStorage
+                sessionStorage.removeItem("auth_token");
+            }
+			
         }
     };
 };
