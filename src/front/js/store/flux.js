@@ -3,16 +3,36 @@ const getState = ({ getStore, getActions, setStore }) => {
         store: {
             message: null,
             token: null, // Add token to the store
-            demo: [
+            menu: [
                 {
-                    title: "FIRST",
-                    background: "white",
-                    initial: "white"
+					id: "1",
+                    title: "Poio",
+                    image: "https://img.hellofresh.com/w_3840,q_auto,f_auto,c_fill,fl_lossy/hellofresh_website/es/cms/SEO/recipes/albondigas-caseras-de-cerdo-con-salsa-barbacoa.jpeg",
                 },
                 {
-                    title: "SECOND",
-                    background: "white",
-                    initial: "white"
+                    id: "2",
+                    title: "Milanga",
+                    image: "https://img.hellofresh.com/w_3840,q_auto,f_auto,c_fill,fl_lossy/hellofresh_website/es/cms/SEO/recipes/albondigas-caseras-de-cerdo-con-salsa-barbacoa.jpeg",
+                },
+				{
+					id: "3",
+                    title: "Poio",
+                    image: "https://img.hellofresh.com/w_3840,q_auto,f_auto,c_fill,fl_lossy/hellofresh_website/es/cms/SEO/recipes/albondigas-caseras-de-cerdo-con-salsa-barbacoa.jpeg",
+                },
+                {
+                    id: "4",
+                    title: "Milanga",
+                    image: "https://img.hellofresh.com/w_3840,q_auto,f_auto,c_fill,fl_lossy/hellofresh_website/es/cms/SEO/recipes/albondigas-caseras-de-cerdo-con-salsa-barbacoa.jpeg",
+                },
+				{
+					id: "5",
+                    title: "Poio",
+                    image: "https://img.hellofresh.com/w_3840,q_auto,f_auto,c_fill,fl_lossy/hellofresh_website/es/cms/SEO/recipes/albondigas-caseras-de-cerdo-con-salsa-barbacoa.jpeg",
+                },
+                {
+                    id: "6",
+                    title: "Milanga",
+                    image: "https://img.hellofresh.com/w_3840,q_auto,f_auto,c_fill,fl_lossy/hellofresh_website/es/cms/SEO/recipes/albondigas-caseras-de-cerdo-con-salsa-barbacoa.jpeg",
                 }
             ]
         },
@@ -76,7 +96,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 					setStore({ error: "An error occurred during login." }); // Store the error message
 					return false; // Return false for failed login
 				}
-			}
+			},
+			logout: () => {
+                // Clear token from store
+                setStore({ token: null });
+                // Remove token from sessionStorage
+                sessionStorage.removeItem("auth_token");
+            }
+			
         }
     };
 };
