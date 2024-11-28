@@ -9,10 +9,12 @@ export const Navbar = () => {
     const isLoggedIn = store.token || sessionStorage.getItem("auth_token");
 
     return (
-        <nav className="navbar navbar-light bg-light">
-            <div className="container">
+        <nav className="navbar navbar-light bg-primary px-0">
+            <div className="container-fluid mx-0">
                 <Link to="/">
-                    <span className="navbar-brand mb-0 h1">React Boilerplate</span>
+                    <span className="navbar-brand mb-0 h1">
+                        <img src="https://anda.com.uy/wp-content/themes/Divi-child/images/logo-anda.svg" style={{ width: "3rem" }}/>
+                    </span>
                 </Link>
                 <div className="ml-auto">
                     {/* Conditionally render buttons */}
