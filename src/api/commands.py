@@ -23,6 +23,9 @@ def setup_commands(app):
             user.email = "test_user" + str(x) + "@test.com"
             user.password = "123456"
             user.is_active = True
+            user.is_cliente = True
+            user.is_cocina = False
+            user.is_admin = False
             db.session.add(user)
             db.session.commit()
             print("User: ", user.email, " created.")
