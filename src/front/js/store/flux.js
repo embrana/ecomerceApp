@@ -1,4 +1,4 @@
-gconst getState = ({ getStore, getActions, setStore }) => {
+const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			message: null,
