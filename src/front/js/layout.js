@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 
+
 import { Home } from "./pages/home";
 import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
@@ -10,6 +11,7 @@ import injectContext from "./store/appContext";
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
 import Login from "./pages/login";
+import DashboardCocina from "./pages/dashboardCocina";
 import Menu from "./pages/menu";
 import ProtectedRoute from "./component/protectedRoute";
 
@@ -32,6 +34,11 @@ const Layout = () => {
                         <Route path="/menu" element={
                             <ProtectedRoute>
                                 <Menu />
+                            </ProtectedRoute>
+                        }/>
+                         <Route path="/dashboard/cocina" element={
+                            <ProtectedRoute>
+                                <DashboardCocina />
                             </ProtectedRoute>
                         }/>
                         <Route element={<Single />} path="/single/:theid" />
