@@ -12,6 +12,7 @@ import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
 import Login from "./pages/login";
 import DashboardCocina from "./pages/dashboardCocina";
+import AñadirMenu from "./pages/añadirMenu";
 import Menu from "./pages/menu";
 import ProtectedRoute from "./component/protectedRoute";
 
@@ -21,7 +22,7 @@ const Layout = () => {
     // you can set the basename on the .env file located at the root of this project, E.g: BASENAME=/react-hello-webapp/
     const basename = process.env.BASENAME || "";
 
-    if(!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL/ >;
+    if (!process.env.BACKEND_URL || process.env.BACKEND_URL == "") return <BackendURL />;
 
     return (
         <div>
@@ -35,12 +36,17 @@ const Layout = () => {
                             <ProtectedRoute>
                                 <Menu />
                             </ProtectedRoute>
-                        }/>
-                         <Route path="/dashboard/cocina" element={
+                        } />
+                        <Route path="/dashboard/cocina" element={
                             <ProtectedRoute>
                                 <DashboardCocina />
                             </ProtectedRoute>
-                        }/>
+                        } />
+                        <Route path="/añadirMenu" element={
+                            <ProtectedRoute>
+                                <AñadirMenu />
+                            </ProtectedRoute>
+                        } />
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
