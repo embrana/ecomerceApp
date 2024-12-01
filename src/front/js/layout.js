@@ -12,7 +12,8 @@ import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
 import Login from "./pages/login";
 import DashboardCocina from "./pages/dashboardCocina";
-import AñadirMenu from "./pages/añadirMenu";
+import AddMenu from "./pages/addMenu";
+import EditMenu from "./pages/editMenu";
 import Menu from "./pages/menu";
 import ProtectedRoute from "./component/protectedRoute";
 
@@ -42,9 +43,14 @@ const Layout = () => {
                                 <DashboardCocina />
                             </ProtectedRoute>
                         } />
-                        <Route path="/añadirMenu" element={
+                        <Route path="/add/menu" element={
                             <ProtectedRoute>
-                                <AñadirMenu />
+                                <AddMenu />
+                            </ProtectedRoute>
+                        } />
+                         <Route path="/edit/menu" element={
+                            <ProtectedRoute>
+                                <EditMenu />
                             </ProtectedRoute>
                         } />
                         <Route element={<Single />} path="/single/:theid" />

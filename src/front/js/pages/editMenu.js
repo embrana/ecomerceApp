@@ -1,11 +1,11 @@
 import React from "react";
 
-const AñadirMenu = () => {
+const EditMenu = () => {
     return (
 
         <div className="container mt-5">
             <div className="container mt-5">
-                <div className="p-2 mb-2 bg-primary text-white text-center">Añadir Menu</div>
+                <div className="p-2 mb-2 bg-primary text-white text-center">Editar Menu</div>
                 <div className="d-flex justify-content-between mt-4 p-5d">
                     <div className="d-flex">
                     </div>
@@ -69,4 +69,4 @@ const AñadirMenu = () => {
     )
 };
 
-export default AñadirMenu;
+export default EditMenu;
