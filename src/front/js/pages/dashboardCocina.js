@@ -114,22 +114,16 @@ const DashboardCocina = () => {
                             <input type="stock" className="form" style={{ height: "40px" }} placeholder="stock" />
                         </div>
                     </div>
-
+                    <div className="container d-flex justify-content-start mt-2">
+                        <button type="button" style={{ width: "60px", height: "60px" }} className="btn btn-secondary me-2"><i className="fa-solid fa-image"></i></button>
+                        <button type="button" style={{ width: "60px", height: "60px" }} className="btn btn-secondary"><i class="fa-regular fa-calendar-days"></i></button>
+                    </div>
                 </div>
                 <div className="mb-4" style={{ width: "50%" }}>
                     <div className="form-floating container ps-1">
-                        <textarea className="form container" placeholder="Descripcion detallada del plato." style={{ height: "300px" }}></textarea>
+                        <textarea className="form container" placeholder="Descripcion detallada del plato." style={{ height: "200px" }}></textarea>
                     </div>
-
-                </div>
-            </div>
-            <div className="d-flex container" style={{ width: "50%" }}>
-                <div className="container d-flex justify-content-start">
-                    <button type="button" style={{ width: "60px", height: "60px" }} className="btn btn-secondary me-2"><i className="fa-solid fa-image"></i></button>
-                    <button type="button" style={{ width: "60px", height: "60px" }} className="btn btn-secondary"><i class="fa-regular fa-calendar-days"></i></button>
-                </div>
-
-                <div className="d-flex justify-content-start mt-2" style={{ width: "50%" }}>
+                    <div className="d-flex justify-content-start mt-2" style={{ width: "50%" }}>
                     <div className="form-check">
                         <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
                         <label className="form-check-label" for="flexCheckDefault">
@@ -143,7 +137,9 @@ const DashboardCocina = () => {
                         </label>
                     </div>
                 </div>
+                </div>
             </div>
+     
             <div className="d-flex justify-content-end">
                 <button className="btn btn-secondary justify-content-end! me-2" type="submit">Cancelar</button>
                 <button className="btn btn-primary justify-content-end!" type="submit">Aceptar</button>
