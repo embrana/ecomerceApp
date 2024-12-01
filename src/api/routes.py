@@ -15,7 +15,7 @@ def handle_hello():
 @api.route('/login', methods=['POST'])
 def login():
     """
-    Handle user login and return a JWT token.
+    Handle user login and return a JWT token with a redirect route based on user role.
     """
     body = request.get_json()
 
@@ -27,12 +27,25 @@ def login():
 
     # Fetch user from the database
     user = User.query.filter_by(email=email, password=password).first()
+
     if user:
+        # Determine the redirection route based on user role
+        if user.is_cliente:
+            redirect_url = '/menu'
+        elif user.is_cocina:
+            redirect_url = '/add/menu'
+        elif user.is_admin:
+            redirect_url = '/menu'
+        else:
+            redirect_url = '/'  # Default route for unassigned roles
+
         # Generate a JWT token
         access_token = create_access_token(identity={"id": user.id, "email": user.email})
-        return jsonify({"token": access_token}), 200
+        
+        return jsonify({"token": access_token, "redirect_url": redirect_url}), 200
 
     return jsonify({"msg": "Invalid email or password"}), 401
+
 
 @api.route('/protected', methods=['GET'])
 @jwt_required()

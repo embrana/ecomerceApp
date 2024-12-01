@@ -53,7 +53,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             ],
             bebidas:[{ 
-                id: "1", 
+                id: "11", 
                 title: "Coca-cola", 
                 image: "https://devotouy.vtexassets.com/arquivos/ids/1506940-800-450?v=638619294071130000&width=800&height=450&aspect=true",
                 description:"Coca cola 600ml",
@@ -61,7 +61,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 stock:""
               },
               { 
-                id: "1", 
+                id: "12", 
                 title: "Spriti", 
                 image: "https://devotouy.vtexassets.com/arquivos/ids/1506940-800-450?v=638619294071130000&width=800&height=450&aspect=true",
                 description:"Coca cola 600ml",
@@ -71,26 +71,30 @@ const getState = ({ getStore, getActions, setStore }) => {
             ]
         },
         actions: {
+            // In appContext.js
             login: async (email, password) => {
                 try {
                     const response = await fetch(process.env.BACKEND_URL + "/api/login", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email, password })
+                        body: JSON.stringify({ email, password }),
                     });
 
-                    const data = await response.json();
-                    if (response.ok) {
-                        sessionStorage.setItem("auth_token", data.token);
-                        setStore({ token: data.token, error: null });
-                        return true;
-                    } else {
-                        setStore({ error: data.msg || "Login failed!" });
-                        return false;
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        setStore({ error: errorData.msg });
+                        return { success: false };
                     }
+
+                    const data = await response.json();
+                    setStore({ token: data.token, error: null });
+
+                    // Return the redirect URL for navigation
+                    return { success: true, redirectUrl: data.redirect_url };
                 } catch (error) {
-                    setStore({ error: "An error occurred during login." });
-                    return false;
+                    console.error("Login error:", error);
+                    setStore({ error: "Network error. Please try again." });
+                    return { success: false };
                 }
             },
             logout: () => {
