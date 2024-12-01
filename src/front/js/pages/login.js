@@ -11,13 +11,13 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         // Clear any previous errors before attempting a new login
         setError("");
-
+    
         // Try logging in
-        const success = await actions.login(email, password);
-
+        const { success, redirectUrl } = await actions.login(email, password);
+    
         // If login failed, show error from store
         if (!success) {
             setError(store.error || "An unknown error occurred.");
@@ -27,9 +27,9 @@ const Login = () => {
                 localStorage.setItem("token", store.token);
             }
             alert("Login successful!");
-            
-            // Redirect to dashboard
-            navigate("/menu");
+    
+            // Redirect to the route provided by the backend
+            navigate(redirectUrl || "/menu");
         }
     };
 
