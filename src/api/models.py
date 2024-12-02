@@ -27,7 +27,7 @@ class User(db.Model):
             "is_admin": self.is_admin,
         }
     
-class Product(db.Model):
+class   Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(50), unique=False, nullable=False)
     name = db.Column(db.String(120), unique=True, nullable=False)
@@ -36,6 +36,12 @@ class Product(db.Model):
 
     def __repr__(self):
         return f'<Product {self.name}>'
+
+    def __init__(self, type, name, description, image):
+        self.type = type
+        self.name = name
+        self.description = description
+        self.image = image
 
     def serialize(self):
 
