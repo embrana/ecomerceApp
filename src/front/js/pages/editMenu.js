@@ -61,8 +61,8 @@ const EditMenu = () => {
             </div>
 
             <div className="d-flex justify-content-end">
-                <button className="btn btn-secondary justify-content-end! me-2" type="submit">Cancelar</button>
-                <button className="btn btn-primary justify-content-end!" type="submit">Aceptar</button>
+            <a className="btn btn-secondary justify-content-end! me-2" href="https://fluffy-space-sniffle-v6gw54q4vvxg3x5gx-3000.app.github.dev/dashboard/cocina" role="submit">Cancelar</a>
+            <a className="btn btn-primary justify-content-end!" href="https://fluffy-space-sniffle-v6gw54q4vvxg3x5gx-3000.app.github.dev/dashboard/cocina" role="submit">Aceptar</a>
             </div>
         </div>
 

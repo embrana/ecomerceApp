@@ -56,9 +56,39 @@ const DashboardCocina = () => {
                             <td>Activo</td>
                             <td>Menu Ejecutivo</td>
                             <td>150</td>
-                            <td><i className="fa-solid fa-image"></i></td>
+                            <td>
+                                <i className="fa-solid fa-image"></i></td>
                             <td>$150</td>
-                            <td><i className="fa-solid fa-pen m-2"></i> <i className="fa-solid fa-download"></i> <i className="fa-solid fa-ellipsis m-auto"></i></td>
+                            <td className="d-flez justifyd-flex justify-content-end">
+                                <a className="btn ustify-content-end!" href="https://fluffy-space-sniffle-v6gw54q4vvxg3x5gx-3000.app.github.dev/add/menu" role="button"> <i className="fa-solid fa-pen"></i></a>
+                                <button className="btn dropdown-toggle me-2 " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i className="fa-solid fa-ellipsis m-auto"></i>
+                                </button>
+                                <ul className="dropdown-menu ">
+                                    <li><a className="dropdown-item" href="#">Activo</a></li>
+                                    <li><a className="dropdown-item" href="#">Inactivo</a></li>
+                                </ul>
+                                {/* <!-- Button trigger modal --> */}
+                                <button type="button" className="btn" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                <i className="fa-solid fa-trash"></i>
+                                </button>
+
+                                {/* modal */}
+                                <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div className="modal-dialog">
+                                        <div className="modal-content">
+                                            <div className="modal-header">
+                                                <h1 className="modal-title fs-5" id="exampleModalLabel">¿usted esta seguro que desea eliminar de forma permanente?</h1>
+                                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div className="modal-footer">
+                                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="button" className="btn btn-primary">Eliminar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
 
                         </tr>
 
