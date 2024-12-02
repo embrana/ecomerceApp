@@ -1,7 +1,21 @@
 from flask import request, jsonify, Blueprint
-from api.models import db, User
+from api.models import db, User, Product
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from api.utils import APIException
+
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
+
+import os
+
+cloudinary.config( 
+    cloud_name = "dd0wschpy", 
+    api_key = "278174897546864", 
+    api_secret = os.getenv("CLOUDINARY_SECRET", ""),
+    secure=True
+)
+
 
 api = Blueprint('api', __name__)
 
@@ -55,3 +69,35 @@ def protected():
     """
     current_user = get_jwt_identity()
     return jsonify({"msg": "Access granted", "user": current_user}), 200
+
+
+@api.route('/products', methods=['POST'])
+def create_product():
+    """
+    Create a new product.
+    """
+    body = request.form
+
+    if not body or "name" not in body or "description" not in body or "type" not in body:
+        raise APIException("Missing product field", status_code=400)
+
+    name = body.get("name")
+    description = body.get("description")
+    type = body.get("type")
+
+    image = request.files.get("image")
+
+    # Upload image to Cloudinary
+    upload_result = cloudinary.uploader.upload(image)
+    image_url = upload_result["secure_url"]
+
+    new_product = Product(
+        name=name, 
+        description=description,
+        type=type,
+        image=image_url
+    )
+    db.session.add(new_product)
+    db.session.commit()
+
+    return jsonify({"msg": "Product created successfully"}), 200
