@@ -101,3 +101,12 @@ def create_product():
     db.session.commit()
 
     return jsonify({"msg": "Product created successfully"}), 200
+
+@api.route('/products', methods=['GET'])
+def get_products():
+    """
+    Get all products.
+    """
+    products = Product.query.all()
+    products = list(map(lambda x: x.serialize(), products))
+    return jsonify(products), 200
