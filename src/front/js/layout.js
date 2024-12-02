@@ -9,8 +9,12 @@ import injectContext from "./store/appContext";
 
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
+
 import Login from "./pages/login";
 import Menu from "./pages/menu";
+
+import NewProduct from "./pages/newProduct";
+
 import ProtectedRoute from "./component/protectedRoute";
 
 //create your first component
@@ -29,6 +33,7 @@ const Layout = () => {
                     <Routes>
                         <Route element={<Home />} path="/" />
                         <Route element={<Login />} path="/login" />
+                        <Route element={ <NewProduct />} path="/new/product" />
                         <Route path="/menu" element={
                             <ProtectedRoute>
                                 <Menu />
