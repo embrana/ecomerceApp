@@ -10,8 +10,8 @@ from cloudinary.utils import cloudinary_url
 import os
 
 cloudinary.config( 
-    cloud_name = "dd0wschpy", 
-    api_key = "278174897546864", 
+    cloud_name = "dnmm7omko", 
+    api_key = "412312661645263", 
     api_secret = os.getenv("CLOUDINARY_SECRET", ""),
     secure=True
 )

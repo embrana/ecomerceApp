@@ -21,7 +21,7 @@ const NewProduct = () => {
         formData.append('description', product.description);
         formData.append('image', image);
 
-        const resp = await fetch(process.env.BACKEND_URL + 'api/products', {
+        const resp = await fetch(process.env.BACKEND_URL + '/api/products', {
             method: 'POST',
             body: formData
         });
