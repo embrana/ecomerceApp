@@ -104,6 +104,30 @@ const getState = ({ getStore, getActions, setStore }) => {
             clearError: () => {
                 setStore({ error: null });
             },
+            // Action to publish a new product
+  publishProduct: async (formData) => {
+    try {
+      const response = await fetch(process.env.BACKEND_URL + "/api/products", {
+        method: 'POST',
+        body: formData,
+      });
+
+      // Check if the response is ok (status code 200-299)
+      if (!response.ok) {
+        const data = await response.json();
+        return { success: false, message: data.message || "Failed to publish product." };
+      }
+
+      // Return a success message on successful response
+      return { success: true, message: "Product created successfully." };
+    } catch (error) {
+      console.error("Error during API call:", error);
+      return { success: false, message: "An error occurred while creating the product." };
+    }
+  },
+
+          
+          
             getMessage: async () => {
                 try {
                     const resp = await fetch(process.env.BACKEND_URL + "/api/hello");
