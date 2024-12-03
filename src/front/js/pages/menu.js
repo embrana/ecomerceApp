@@ -7,36 +7,14 @@ export const Menu = () => {
     const { store } = useContext(Context); // Accessing store from Flux context
 
     return (
-        <div className="container mt-3">
-            <div className="row text-center">
-                <h2 className="fs-1">Menus semanales</h2>
-                {/* Map through store.menu array and create Card components */}
-                {store.menu.map((item) => (
-                    <div className="col-12 col-sm-6 col-md-4 mb-4" key={item.id}>
-                        <Card item={item} />
-                    </div>
-                ))}
-            </div>
-            <div className="row text-center">
-                <h2 className="fs-1">Minutas</h2>
-                {/* Map through store.menu array and create Card components */}
-                {store.menu.map((item) => (
-                    <div className="col-12 col-sm-6 col-md-4 mb-4" key={item.id}>
-                        <Card item={item} />
-                    </div>
-                ))}
-            </div>
-            <div className="row text-center">
-                <h2 className="fs-1">Bebidas</h2>
-                {/* Map through store.menu array and create Card components */}
-                {store.bebidas.map((item) => (
-                    <div className="col-12 col-sm-6 col-md-4 mb-4" key={item.id}>
-                        <Card item={item}/>
-                        
-                    </div>
-                ))}
-            </div>
-        </div>
+        <div key={index} className="card" style={{ width: "18rem" }}>
+			  <img src={product.image} className="card-img-top" alt="..." />
+			<div className="card-body">
+				<h5 className="card-title">{product.name}</h5>
+				<p className="card-text">{product.description}</p>
+				<a href="#" className="btn btn-primary">Go somewhere</a>
+			</div>
+		</div>
     );
 };
 
