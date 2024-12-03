@@ -78,29 +78,49 @@ def create_product():
     """
     body = request.form
 
-    if not body or "name" not in body or "description" not in body or "type" not in body:
+    # Validate required fields
+    if not body or "name" not in body or "description" not in body or "type" not in body or "stock" not in body:
         raise APIException("Missing product field", status_code=400)
 
     name = body.get("name")
     description = body.get("description")
     type = body.get("type")
+    stock = body.get("stock")
 
+    # Log the received stock value for debugging
+    print(f"Received stock value: {stock}")
+
+    # Validate stock as a positive integer
+    if not stock.isdigit() or int(stock) < 0:
+        raise APIException("Invalid stock value", status_code=400)
+
+    stock = int(stock)  # Convert stock to an integer after validation
+
+    # Handle file upload for image
     image = request.files.get("image")
+    if not image:
+        raise APIException("Image is required", status_code=400)
 
-    # Upload image to Cloudinary
-    upload_result = cloudinary.uploader.upload(image)
-    image_url = upload_result["secure_url"]
+    try:
+        upload_result = cloudinary.uploader.upload(image)
+        image_url = upload_result["secure_url"]
+    except Exception as e:
+        raise APIException(f"Error uploading image: {str(e)}", status_code=500)
 
+    # Create new product
     new_product = Product(
         name=name, 
         description=description,
         type=type,
+        stock=stock,
+        is_active=True,  # Default to True for new products
         image=image_url
     )
     db.session.add(new_product)
     db.session.commit()
 
     return jsonify({"msg": "Product created successfully"}), 200
+
 
 @api.route('/products', methods=['GET'])
 def get_products():
