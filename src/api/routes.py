@@ -47,9 +47,9 @@ def login():
         if user.is_cliente:
             redirect_url = '/menu'
         elif user.is_cocina:
-            redirect_url = '/add/menu'
+            redirect_url = '/dashboard/cocina'
         elif user.is_admin:
-            redirect_url = '/menu'
+            redirect_url = '/dashboard/cocina'
         else:
             redirect_url = '/'  # Default route for unassigned roles
 

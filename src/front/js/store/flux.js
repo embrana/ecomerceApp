@@ -15,16 +15,17 @@ const getState = ({ getStore, getActions, setStore }) => {
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ email, password }),
                     });
-
+            
                     if (!response.ok) {
                         const errorData = await response.json();
                         setStore({ error: errorData.msg });
                         return { success: false };
                     }
-
+            
                     const data = await response.json();
+                    sessionStorage.setItem("auth_token", data.token); // Store token in sessionStorage
                     setStore({ token: data.token, error: null });
-
+            
                     // Return the redirect URL for navigation
                     return { success: true, redirectUrl: data.redirect_url };
                 } catch (error) {
