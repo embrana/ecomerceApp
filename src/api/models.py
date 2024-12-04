@@ -35,7 +35,7 @@ class Product(db.Model):
     is_active = db.Column(db.Boolean(), unique=False, nullable=False, default=True)
     stock = db.Column(db.Integer, unique=False, nullable=False)  # Must be positive
     image = db.Column(db.String(1500), unique=False, nullable=False)
-
+    
     def __repr__(self):
         return f'<Product {self.name}>'
 
