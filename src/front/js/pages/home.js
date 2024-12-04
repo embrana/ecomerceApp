@@ -12,12 +12,11 @@ export const Home = () => {
 
     return (
         <div className="text-center mt-5">
-            <h1>Hello Rigo!!</h1>
+            <h1>Bienvenidos a la app de gestion del comedor!</h1>
             <p>
                 <img src={rigoImageUrl} />
             </p>
-            <h2>Products</h2>
-            
+
         </div>
     );
 };

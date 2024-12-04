@@ -5,6 +5,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             token: sessionStorage.getItem("auth_token") || null, // Initialize token from sessionStorage
             error: null, // Centralized error handling
             products: [], // Add products to the store
+            cart: [], // Items in the cart
             menu: [
                 { id: "1",
                   title: "Asado con fritas", 
@@ -137,6 +138,19 @@ const getState = ({ getStore, getActions, setStore }) => {
               console.error("Error fetching products:", error);
           }
       },
+      // Add to cart action
+      addToCart: (item) => {
+        const store = getStore();
+        const updatedCart = [...store.cart, item];
+        setStore({ cart: updatedCart });
+        console.log("Item added to cart:", item);
+    },
+    // Remove from cart (optional, for future use)
+    removeFromCart: (itemId) => {
+      const store = getStore();
+      const updatedCart = store.cart.filter(item => item.id !== itemId);
+      setStore({ cart: updatedCart });
+  },
             getMessage: async () => {
                 try {
                     const resp = await fetch(process.env.BACKEND_URL + "/api/hello");
