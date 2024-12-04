@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from "react";
 import Card from "../component/card";
 import { Context } from "../store/appContext";
 
+
 export const Menu = () => {
     const { store, actions } = useContext(Context);
 
