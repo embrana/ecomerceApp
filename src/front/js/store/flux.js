@@ -4,6 +4,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             message: null,
             token: sessionStorage.getItem("auth_token") || null, // Initialize token from sessionStorage
             error: null, // Centralized error handling
+            products: [], // Add products to the store
             menu: [
                 { id: "1",
                   title: "Asado con fritas", 
@@ -105,29 +106,37 @@ const getState = ({ getStore, getActions, setStore }) => {
                 setStore({ error: null });
             },
             // Action to publish a new product
-  publishProduct: async (formData) => {
-    try {
-      const response = await fetch(process.env.BACKEND_URL + "/api/products", {
-        method: 'POST',
-        body: formData,
-      });
+            publishProduct: async (formData) => {
+            try {
+                const response = await fetch(process.env.BACKEND_URL + "/api/products", {
+                  method: 'POST',
+                  body: formData,
+                });
 
-      // Check if the response is ok (status code 200-299)
-      if (!response.ok) {
-        const data = await response.json();
-        return { success: false, message: data.message || "Failed to publish product." };
-      }
+            // Check if the response is ok (status code 200-299)
+            if (!response.ok) {
+              const data = await response.json();
+              return { success: false, message: data.message || "Failed to publish product." };
+            }
 
-      // Return a success message on successful response
-      return { success: true, message: "Product created successfully." };
-    } catch (error) {
-      console.error("Error during API call:", error);
-      return { success: false, message: "An error occurred while creating the product." };
-    }
-  },
-
-          
-          
+            // Return a success message on successful response
+            return { success: true, message: "Product created successfully." };
+          } catch (error) {
+            console.error("Error during API call:", error);
+            return { success: false, message: "An error occurred while creating the product." };
+          }
+        },
+        // Action to fetch products
+        getProducts: async () => {
+          try {
+              const response = await fetch(process.env.BACKEND_URL + "/api/products");
+              if (!response.ok) throw new Error("Failed to fetch products");
+              const data = await response.json();
+              setStore({ products: data }); // Update the store with fetched products
+          } catch (error) {
+              console.error("Error fetching products:", error);
+          }
+      },
             getMessage: async () => {
                 try {
                     const resp = await fetch(process.env.BACKEND_URL + "/api/hello");
