@@ -80,12 +80,11 @@ const getState = ({ getStore, getActions, setStore }) => {
         setStore({ cart: updatedCart });
         console.log("Item added to cart:", item);
     },
-    // Remove from cart (optional, for future use)
-    removeFromCart: (itemId) => {
-      const store = getStore();
-      const updatedCart = store.cart.filter(item => item.id !== itemId);
-      setStore({ cart: updatedCart });
-  },
+        removeFromCart: (indexToRemove) => {
+        const store = getStore();
+        const updatedCart = store.cart.filter((_, index) => index !== indexToRemove);
+        setStore({ cart: updatedCart });
+        },
             getMessage: async () => {
                 try {
                     const resp = await fetch(process.env.BACKEND_URL + "/api/hello");

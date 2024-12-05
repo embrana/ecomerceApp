@@ -1,6 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import Card from "../component/card";
 import { Context } from "../store/appContext";
+import Counter from "../component/counter";
 
 
 export const Menu = () => {
@@ -37,7 +38,7 @@ export const Menu = () => {
                     {type2Products.length > 0 ? (
                         type2Products.map((product, index) => (
                             <div className="col-md-4" key={index}>
-                                <Card item={product} />
+                                <Card item={product}></Card> 
                             </div>
                         ))
                     ) : (
