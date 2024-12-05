@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Context } from "../store/appContext";
 
+
 const Card = ({ item }) => {
     const { actions } = useContext(Context);
 
@@ -15,7 +16,7 @@ const Card = ({ item }) => {
                 <h5 className="card-title text-dark">{item.name}</h5>
                 <p className="card-text text-muted">{item.description}</p>
                 <button className="btn btn-outline-primary w-100" onClick={handleAddToCart}>
-                    Reservar
+                    Agregar
                 </button>
             </div>
         </div>
