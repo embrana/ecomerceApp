@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import Card from "../component/card";
 import { Context } from "../store/appContext";
-import Counter from "../component/counter";
+import Cart from "../component/cart";
 
 
 export const Menu = () => {
@@ -61,6 +61,9 @@ export const Menu = () => {
                     )}
                 </div>
             </div>
+
+                    <Cart/>
+
         </div>
     );
 };
