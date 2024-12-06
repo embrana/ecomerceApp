@@ -42,7 +42,7 @@ const Cart = () => {
                                         <input type="text" className="form-control input-sm" value="1" />
                                     </div>
                                     <div className="col-2">
-                                        <button type="button" className="btn btn-link btn-xs">
+                                        <button type="button" className="btn btn-link btn-xs" onClick={() => actions.removeFromCart(index)}>
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </div>
