@@ -18,6 +18,7 @@ import EditMenu from "./pages/editMenu";
 import Menu from "./pages/menu";
 
 import ProtectedRoute from "./component/protectedRoute";
+import Cart from "./component/cart";
 
 //create your first component
 const Layout = () => {
@@ -53,6 +54,11 @@ const Layout = () => {
                          <Route path="/edit/menu" element={
                             <ProtectedRoute>
                                 <EditMenu />
+                            </ProtectedRoute>
+                        } />
+                         <Route path="/cart" element={
+                            <ProtectedRoute>
+                                <Cart />
                             </ProtectedRoute>
                         } />
                         <Route element={<Single />} path="/single/:theid" />

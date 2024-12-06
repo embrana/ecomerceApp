@@ -1,4 +1,5 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
+import { Context } from "../store/appContext";
 
 
 const Card = ({ item }) => {
@@ -20,18 +21,10 @@ const Card = ({ item }) => {
                 style={{ height: "12rem", objectFit: "cover" }} 
             />
             <div className="card-body">
-                <h5 className="card-title text-dark">{item.name || "Unnamed Product"}</h5>
-                <p className="card-text text-muted">{item.description || "No description available."}</p>
-                <p className="card-text">
-                    <strong>Price:</strong> {item.price ? `$${item.price}` : "N/A"}
-                </p>
-                <button 
-                    className={`btn ${loading ? "btn-secondary" : "btn-outline-primary"} w-100`} 
-                    onClick={handleAddToCart} 
-                    disabled={loading} 
-                    aria-label={`Add ${item.name || "this item"} to the cart`}
-                >
-                    {loading ? "Reservando..." : "Reservar"}
+                <h5 className="card-title text-dark">{item.name}</h5>
+                <p className="card-text text-muted">{item.description}</p>
+                <button className="btn btn-outline-primary w-100" onClick={handleAddToCart}>
+                    Agregar
                 </button>
             </div>
         </div>

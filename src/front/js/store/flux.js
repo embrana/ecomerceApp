@@ -15,7 +15,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     "Content-Type": "application/json",
                     ...(token && { "Authorization": `Bearer ${token}` }),
                 };
-
+   
                 const response = await fetch(url, { ...options, headers });
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -23,7 +23,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
                 return response.json();
             },
-
+   
             // Login action
             login: async (email, password) => {
                 try {
@@ -32,17 +32,17 @@ const getState = ({ getStore, getActions, setStore }) => {
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ email, password }),
                     });
-
+   
                     if (!response.ok) {
                         const errorData = await response.json();
                         setStore({ error: errorData.msg });
                         return { success: false };
                     }
-
+   
                     const data = await response.json();
                     sessionStorage.setItem("auth_token", data.token); // Store token in sessionStorage
                     setStore({ token: data.token, error: null });
-
+   
                     return { success: true, redirectUrl: data.redirect_url };
                 } catch (error) {
                     console.error("Login error:", error);
@@ -50,7 +50,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false };
                 }
             },
-
+   
             // Get orders
             getOrders: async () => {
                 try {
@@ -67,51 +67,64 @@ const getState = ({ getStore, getActions, setStore }) => {
                     setStore({ orders: [] });
                 }
             },
-
-            // Fetch products (already in your code)
+   
+            // Publish a new product
+            publishProduct: async (formData) => {
+                try {
+                    const response = await fetch(process.env.BACKEND_URL + "/api/products", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${getStore().token}`,
+                        },
+                        body: formData, // FormData object
+                    });
+   
+                    if (!response.ok) {
+                        const data = await response.json();
+                        return { success: false, message: data.message || "Failed to publish product." };
+                    }
+   
+                    return { success: true, message: "Product created successfully." };
+                } catch (error) {
+                    console.error("Error during API call:", error);
+                    return { success: false, message: "An error occurred while creating the product." };
+                }
+            },
+   
+            // Action to fetch products
             getProducts: async () => {
                 try {
-                    const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/products");
-
-                    if (data && Array.isArray(data.products)) {
-                        setStore({ products: data.products });
+                    const response = await fetch(process.env.BACKEND_URL + "/api/products");
+                    if (!response.ok) throw new Error("Failed to fetch products");
+                    const data = await response.json();
+   
+                    if (Array.isArray(data)) {
+                        setStore({ products: data }); // Ensure the response is an array
                     } else {
-                        console.error("Unexpected response format:", data);
+                        console.error("Unexpected response format for products:", data);
                         setStore({ products: [] });
                     }
                 } catch (error) {
                     console.error("Error fetching products:", error);
-                    setStore({ products: [] });
                 }
             },
-
-            // Add item to cart (already in your code)
+   
+            // Add to cart action
             addToCart: (item) => {
                 const store = getStore();
                 const updatedCart = [...store.cart, item];
                 setStore({ cart: updatedCart });
                 console.log("Item added to cart:", item);
             },
-
-            // Remove item from cart (already in your code)
-            removeFromCart: (itemId) => {
+   
+            // Remove item from cart action
+            removeFromCart: (indexToRemove) => {
                 const store = getStore();
-                const updatedCart = store.cart.filter(item => item.id !== itemId);
+                const updatedCart = store.cart.filter((_, index) => index !== indexToRemove);
                 setStore({ cart: updatedCart });
-            },
-
-            // Fetch a welcome message (already in your code)
-            getMessage: async () => {
-                try {
-                    const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/hello");
-                    setStore({ message: data.message });
-                    return data;
-                } catch (error) {
-                    console.error("Error loading message from backend", error);
-                }
             },
         },
     };
-};
-
-export default getState;
+   };
+   
+   export default getState;
