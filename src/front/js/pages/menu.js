@@ -16,6 +16,7 @@ export const Menu = () => {
     const type3Products = store.products.filter(product => product.type === "Bebidas");
 
     return (
+        <div className="container d-flex">
         <div className="container my-5">
             <div className="mb-5">
                 <h2 className="text-center text-primary mb-4">Menu Ejecutivo</h2>
@@ -61,9 +62,8 @@ export const Menu = () => {
                     )}
                 </div>
             </div>
-
-                    <Cart/>
-
+        </div>
+            <Cart/>
         </div>
     );
 };

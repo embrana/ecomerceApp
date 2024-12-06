@@ -25,48 +25,65 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
    
             // Login action
-            login: async (email, password) => {
-                try {
-                    const response = await fetch(process.env.BACKEND_URL + "/api/login", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ email, password }),
-                    });
-   
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        setStore({ error: errorData.msg });
-                        return { success: false };
-                    }
-   
-                    const data = await response.json();
-                    sessionStorage.setItem("auth_token", data.token); // Store token in sessionStorage
-                    setStore({ token: data.token, error: null });
-   
-                    return { success: true, redirectUrl: data.redirect_url };
-                } catch (error) {
-                    console.error("Login error:", error);
-                    setStore({ error: "Network error. Please try again." });
+         login: async (email, password) => {
+            try {
+                const response = await fetch(process.env.BACKEND_URL + "/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    setStore({ error: errorData.msg });
                     return { success: false };
                 }
-            },
+
+                const data = await response.json();
+                sessionStorage.setItem("auth_token", data.token); // Store token in sessionStorage
+                setStore({ token: data.token, error: null });
+
+                return { success: true, redirectUrl: data.redirect_url };
+            } catch (error) {
+                console.error("Login error:", error);
+                setStore({ error: "Network error. Please try again." });
+                return { success: false };
+            }
+        },
+
+        logout: () => {
+            // Clear the token from sessionStorage
+            sessionStorage.removeItem("auth_token");
+
+            // Reset the store values
+            setStore({
+                token: null,
+                cart: [],
+                orders: [],
+                products: [],
+                error: null,
+            });
+
+            console.log("User logged out.");
+        },
    
             // Get orders
-            getOrders: async () => {
-                try {
-                    const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/orders");  // Adjust API URL
-                    // If successful, update the store with the fetched orders
-                    if (data && Array.isArray(data.orders)) {
-                        setStore({ orders: data.orders });
-                    } else {
-                        console.error("Unexpected response format:", data);
-                        setStore({ orders: [] });
-                    }
-                } catch (error) {
-                    console.error("Error fetching orders:", error);
+         getOrders: async () => {
+            try {
+                const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/orders");  // Adjust API URL
+                // If successful, update the store with the fetched orders
+                if (data && Array.isArray(data.orders)) {
+                    setStore({ orders: data.orders });
+                } else {
+                    console.error("Unexpected response format:", data);
                     setStore({ orders: [] });
                 }
-            },
+            } catch (error) {
+                console.error("Error fetching orders:", error);
+                setStore({ orders: [] });
+            }
+        },
+
    
             // Publish a new product
             publishProduct: async (formData) => {
@@ -96,13 +113,15 @@ const getState = ({ getStore, getActions, setStore }) => {
                 try {
                     const response = await fetch(process.env.BACKEND_URL + "/api/products");
                     if (!response.ok) throw new Error("Failed to fetch products");
+                    
                     const data = await response.json();
-   
-                    if (Array.isArray(data)) {
-                        setStore({ products: data }); // Ensure the response is an array
+                    
+                    // Check if the response contains a 'products' property which is an array
+                    if (Array.isArray(data.products)) {
+                        setStore({ products: data.products }); // Store the products array
                     } else {
                         console.error("Unexpected response format for products:", data);
-                        setStore({ products: [] });
+                        setStore({ products: [] }); // Fallback to empty array if the format is not correct
                     }
                 } catch (error) {
                     console.error("Error fetching products:", error);
@@ -122,6 +141,16 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const store = getStore();
                 const updatedCart = store.cart.filter((_, index) => index !== indexToRemove);
                 setStore({ cart: updatedCart });
+            },
+
+            getMessage: async () => {
+                try {
+                    const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/hello");
+                    setStore({ message: data.message });
+                    return data;
+                } catch (error) {
+                    console.error("Error loading message from backend", error);
+                }
             },
         },
     };
