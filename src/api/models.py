@@ -11,6 +11,9 @@ class User(db.Model):
     is_cocina = db.Column(db.Boolean(), unique=False, nullable=False, default=False)
     is_admin = db.Column(db.Boolean(), unique=False, nullable=False, default=False)
 
+    # Relationship to orders
+    orders = db.relationship("Order", backref="user", lazy=True)
+
     def __repr__(self):
         return f'<User {self.email}>'
 
@@ -26,7 +29,7 @@ class User(db.Model):
             "is_cocina": self.is_cocina,
             "is_admin": self.is_admin,
         }
-    
+
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(50), unique=False, nullable=False)
@@ -35,7 +38,10 @@ class Product(db.Model):
     is_active = db.Column(db.Boolean(), unique=False, nullable=False, default=True)
     stock = db.Column(db.Integer, unique=False, nullable=False)  # Must be positive
     image = db.Column(db.String(1500), unique=False, nullable=False)
-    
+
+    # Relationship to orders
+    orders = db.relationship("Order", backref="product", lazy=True)
+
     def __repr__(self):
         return f'<Product {self.name}>'
 
@@ -56,4 +62,25 @@ class Product(db.Model):
             "stock": self.stock,
             "is_active": self.is_active,
             "image": self.image
+        }
+
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    status = db.Column(db.String(50), nullable=False, default="Pending")
+
+    def __repr__(self):
+        return f'<Order {self.id} - User {self.user_id} - Product {self.product_id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "product": self.product.serialize(),
+            "quantity": self.quantity,
+            "date": self.date.isoformat(),
+            "status": self.status
         }
