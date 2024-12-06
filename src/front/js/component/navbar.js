@@ -20,7 +20,7 @@ export const Navbar = () => {
 
                 <div className="ml-auto d-flex align-items-center">
                     {/* Cart Dropdown */}
-                    <div className="dropdown me-3">
+                    <div className={`dropdown me-3 ${!isLoggedIn ? 'd-none' : ''}`}>
                         <button
                             className="btn btn-light dropdown-toggle"
                             type="button"
@@ -37,7 +37,7 @@ export const Navbar = () => {
                                         <span>{item.name}</span>
                                         <button
                                             className="btn btn-sm btn-danger"
-                                            onClick={() => actions.removeFromCart(item.id)}
+                                            onClick={() => actions.removeFromCart(index)}
                                         >
                                             Remove
                                         </button>
