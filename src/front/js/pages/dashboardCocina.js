@@ -61,6 +61,9 @@ const DashboardCocina = () => {
               Añadir Menu
             </button>
           </Link>
+          <Link to={"/menu"} className="ms-2">
+      <button type="submit" className="btn btn-primary">Compra Menu</button>
+      </Link>
         </div>
       </div>
       <div>

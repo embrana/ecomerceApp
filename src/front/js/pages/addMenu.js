@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Context } from "../store/appContext";
+import { Link } from "react-router-dom";
 
 const AddMenu = () => {
   const { actions } = useContext(Context);
@@ -166,6 +167,12 @@ const AddMenu = () => {
           </button>
         </div>
       </form>
+      <Link to={"/dashboard/cocina"}>
+      <button type="submit" className="btn btn-primary">Volver</button>
+      </Link>
+      <Link to={"/menu"}>
+      <button type="submit" className="btn btn-primary">Compra Menu</button>
+      </Link>
     </div>
   );
 };
