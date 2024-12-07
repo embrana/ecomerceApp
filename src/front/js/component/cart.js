@@ -34,48 +34,48 @@ const Cart = () => {
     }, [store.cart]);
 
     return (
-<div className="container my-4">
+<div className="container my-4" style={{ maxWidth: "400px", margin: "0 auto" }}>
     <div className="row border">
         <div className="col-12">
             <div className="panel panel-info mt-2">
                 <div className="panel-heading">
-                    <div className="panel-title">
-                        <div className="row">
-                            <p className="fs-5 fw-bold">
-                                <i className="fa-solid fa-cart-shopping"></i> Shopping Cart
-                            </p>
-                        </div>
+                    <div className="panel-title text-center">
+                        <p className="fs-5 fw-bold">
+                            <i className="fa-solid fa-cart-shopping"></i> Shopping Cart
+                        </p>
                     </div>
                 </div>
 
                 <div className="panel-body mt-2">
                     {store.cart.length > 0 ? (
                         store.cart.map((item, index) => (
-                            <div className="d-flex align-items-center border-bottom py-2" key={index}>
+                            <div
+                                className="d-flex align-items-center border-bottom py-2"
+                                key={index}
+                                style={{ fontSize: "0.9rem" }}
+                            >
                                 {/* Imagen del producto */}
-                                <div className="flex-shrink-0 me-3">
+                                <div className="flex-shrink-0" style={{ width: "60px" }}>
                                     <img
                                         className="img-fluid"
                                         src={item.image || "https://via.placeholder.com/150x100"}
                                         alt="Product"
-                                        style={{ width: "75px", height: "50px", objectFit: "cover" }}
+                                        style={{
+                                            width: "60px",
+                                            height: "40px",
+                                            objectFit: "cover",
+                                        }}
                                     />
                                 </div>
 
-                                {/* Nombre del producto */}
-                                <div className="flex-grow-1 text-truncate me-3">
-                                    <h6 className="product-name mb-0" style={{ fontSize: "0.9rem" }}>
-                                        {item.name}
-                                    </h6>
-                                </div>
-
-                                {/* Precio */}
-                                <div className="me-3" style={{ fontSize: "0.9rem" }}>
-                                    ${item.price}
+                                {/* Nombre y precio del producto */}
+                                <div className="flex-grow-1 ms-2">
+                                    <h6 className="mb-1 text-truncate">{item.name}</h6>
+                                    <p className="mb-0 text-muted">${item.price}</p>
                                 </div>
 
                                 {/* Selector de cantidad */}
-                                <div className="d-flex align-items-center me-3">
+                                <div className="d-flex align-items-center">
                                     <button
                                         type="button"
                                         className="btn btn-outline-secondary btn-sm"
@@ -107,7 +107,7 @@ const Cart = () => {
                                 </div>
 
                                 {/* Botón para eliminar */}
-                                <div>
+                                <div className="ms-2">
                                     <button
                                         type="button"
                                         className="btn btn-link btn-sm text-danger"
@@ -119,19 +119,19 @@ const Cart = () => {
                             </div>
                         ))
                     ) : (
-                        <p className="text-muted">Your cart is empty</p>
+                        <p className="text-muted text-center">Your cart is empty</p>
                     )}
                 </div>
 
                 {/* Footer del carrito */}
                 <div className="panel-footer mt-3">
-                    <div className="row">
-                        <div className="col-8">
-                            <h5 className="text-end" style={{ fontSize: "1rem" }}>
+                    <div className="row align-items-center">
+                        <div className="col-6 text-start">
+                            <h5 style={{ fontSize: "1rem" }}>
                                 Total: <strong>${store.cart.reduce((total, item, index) => total + item.price * (quantities[index] || 1), 0)}</strong>
                             </h5>
                         </div>
-                        <div className="col-4 text-end">
+                        <div className="col-6 text-end">
                             <button
                                 type="button"
                                 className="btn btn-success"
@@ -146,6 +146,7 @@ const Cart = () => {
         </div>
     </div>
 </div>
+
     );
 };
 
