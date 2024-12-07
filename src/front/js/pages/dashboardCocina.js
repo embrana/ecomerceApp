@@ -10,9 +10,9 @@ const DashboardCocina = () => {
   useEffect(() => {
     
     actions.getOrders();
-  }, [actions]);
+  }, []);
 
-  if (!orders.length) return <p>Loading orders...</p>;
+  // if (!orders.length) return <p>Loading orders...</p>;
 
   return (
     <div className="container mt-5">
