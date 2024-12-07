@@ -23,6 +23,7 @@ const Card = ({ item }) => {
             />
             <div className="card-body">
                 <h5 className="card-title text-dark">{item.name}</h5>
+                <h5 className="card-title text-dark">Precio ${item.price}</h5>
                 <p className="card-text text-muted">{item.description}</p>
                 <button className="btn btn-outline-primary w-100" onClick={handleAddToCart}>
                     Agregar

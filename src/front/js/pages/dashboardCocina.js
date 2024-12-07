@@ -12,7 +12,6 @@ const DashboardCocina = () => {
     actions.getOrders();
   }, []);
 
-  // if (!orders.length) return <p>Loading orders...</p>;
 
   return (
     <div className="container mt-5">

@@ -78,13 +78,14 @@ def create_product():
     body = request.form
 
     # Validate required fields
-    if not body or "name" not in body or "description" not in body or "type" not in body or "stock" not in body:
+    if not body or "name" not in body or "description" not in body or "type" not in body or "stock" not in body or "price" not in body:
         raise APIException("Missing product field", status_code=400)
 
     name = body.get("name")
     description = body.get("description")
     type = body.get("type")
     stock = body.get("stock")
+    price = body.get("price")
 
     # Log the received stock value for debugging
     print(f"Received stock value: {stock}")
@@ -113,7 +114,8 @@ def create_product():
         type=type,
         stock=stock,
         is_active=True,  # Default to True for new products
-        image=image_url
+        image=image_url,
+        price=price
     )
     db.session.add(new_product)
     db.session.commit()

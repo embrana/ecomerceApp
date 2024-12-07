@@ -38,6 +38,7 @@ class Product(db.Model):
     is_active = db.Column(db.Boolean(), unique=False, nullable=False, default=True)
     stock = db.Column(db.Integer, unique=False, nullable=False)  # Must be positive
     image = db.Column(db.String(1500), unique=False, nullable=False)
+    price = db.Column(db.Integer, unique=False, nullable=False, default=0)
 
     # Relationship to orders
     orders = db.relationship("Order", backref="product", lazy=True)
@@ -45,13 +46,14 @@ class Product(db.Model):
     def __repr__(self):
         return f'<Product {self.name}>'
 
-    def __init__(self, type, name, description, stock, image, is_active=True):
+    def __init__(self, type, name, description, stock, image, price, is_active=True):
         self.type = type
         self.name = name
         self.description = description
         self.is_active = is_active
         self.stock = stock
         self.image = image
+        self.price = price
 
     def serialize(self):
         return {
@@ -61,7 +63,8 @@ class Product(db.Model):
             "description": self.description,
             "stock": self.stock,
             "is_active": self.is_active,
-            "image": self.image
+            "image": self.image,
+            "price": self.price
         }
 
 class Order(db.Model):
