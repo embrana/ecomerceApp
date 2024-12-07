@@ -107,8 +107,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false, message: "An error occurred while creating the product." };
                 }
             },
-
-              // Publish a new product
               setOrder: async (cart) => {
                 try {
 
@@ -141,8 +139,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false, message: "An error occurred while creating the ORDER." };
                 }
             },
-   
-            // Action to fetch products
             getProducts: async () => {
                 try {
                     const response = await fetch(process.env.BACKEND_URL + "/api/products");
@@ -161,22 +157,25 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error("Error fetching products:", error);
                 }
             },
-   
-            // Add to cart action
             addToCart: (item) => {
                 const store = getStore();
                 const updatedCart = [...store.cart, item];
                 setStore({ cart: updatedCart });
+                localStorage.setItem("cart", JSON.stringify(updatedCart));
                 console.log("Item added to cart:", item);
             },
-   
-            // Remove item from cart action
-            removeFromCart: (indexToRemove) => {
-                const store = getStore();
-                const updatedCart = store.cart.filter((_, index) => index !== indexToRemove);
-                setStore({ cart: updatedCart });
+            initializeCart: () => {
+                const savedCart = localStorage.getItem("cart");
+                if (savedCart) {
+                    setStore({ cart: JSON.parse(savedCart) });
+                }
             },
-
+            removeFromCart: (index) => {
+                const store = getStore();
+                const updatedCart = store.cart.filter((_, i) => i !== index);
+                setStore({ cart: updatedCart });
+                localStorage.setItem("cart", JSON.stringify(updatedCart));
+            },
             getMessage: async () => {
                 try {
                     const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/hello");

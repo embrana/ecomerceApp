@@ -4,6 +4,7 @@ import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 
 
+
 import { Home } from "./pages/home";
 import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
@@ -16,6 +17,7 @@ import DashboardCocina from "./pages/dashboardCocina";
 import AddMenu from "./pages/addMenu";
 import EditMenu from "./pages/editMenu";
 import Menu from "./pages/menu";
+import { CheckOut } from "./pages/checkout";
 
 import ProtectedRoute from "./component/protectedRoute";
 import Cart from "./component/cart";
@@ -59,6 +61,11 @@ const Layout = () => {
                          <Route path="/cart" element={
                             <ProtectedRoute>
                                 <Cart />
+                            </ProtectedRoute>
+                        } />
+                          <Route path="/checkout" element={
+                            <ProtectedRoute>
+                                <CheckOut />
                             </ProtectedRoute>
                         } />
                         <Route element={<Single />} path="/single/:theid" />
