@@ -147,14 +147,14 @@ const ProductCO = () => {
                         <div className="col-6 text-end">
                             <button
                                 type="button"
-                                className="btn btn-success"
+                                className="btn btn-success my-1 w-100"
                                 onClick={() => actions.setOrder()}
                             >
                                 Pagar en Efectivo
                             </button>
                             <button
                                 type="button"
-                                className="btn btn-success"
+                                className="btn btn-success w-100 mb-1"
                                 onClick={() => actions.setOrder()}
                             >
                                 Mercado Pago

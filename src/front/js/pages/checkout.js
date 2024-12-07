@@ -18,7 +18,7 @@ export const CheckOut = () => {
     ];
 
     return (
-                <div className="col-lg-4">
+                <div className="container mx-5">
                     <ProductCO />
                 </div>
     );

@@ -45,7 +45,7 @@ const Cart = () => {
         });
     }, [store.cart]);
 
-    return (
+    return ( 
         
 <div className="container my-4" style={{ maxWidth: "400px", margin: "0 auto" }}>
 <button class="responsive-btn" onClick={()=>{toggleCheckout()}}>Cart</button>
@@ -101,13 +101,13 @@ const Cart = () => {
                                     </button>
                                     <input
                                         type="number"
-                                        className="form-control form-control-sm text-center mx-1"
+                                        className="form-control form-control-sm text-center mx-1 no-arrows"
                                         value={quantities[index] || 1}
                                         onChange={(e) =>
                                             handleQuantityChange(index, Math.max(1, Number(e.target.value)))
                                         }
                                         min="1"
-                                        style={{ width: "50px" }}
+                                        style={{ width: "50px"}}
                                     />
                                     <button
                                         type="button"
@@ -145,11 +145,11 @@ const Cart = () => {
                                 Total: <strong>${store.cart.reduce((total, item, index) => total + item.price * (quantities[index] || 1), 0)}</strong>
                             </h5>
                         </div>
-                        <div className="col-6 text-end">
+                        <div className="col-6 text-end my-2">
                         <Link to={"/checkout"}>
                             <button
                                 type="button"
-                                className="btn btn-success"
+                                className="btn btn-success my-2"
                             >
                                 Pagar
                             </button>
