@@ -102,7 +102,7 @@ const Cart = () => {
                                     </h4>
                                 </div>
                                 <div className="col-3">
-                                    <button type="button" className="btn btn-success btn-block">
+                                    <button type="button" className="btn btn-success btn-block" onClick={() => actions.setOrder()}>
                                         Checkout
                                     </button>
                                 </div>

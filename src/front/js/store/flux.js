@@ -107,6 +107,40 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false, message: "An error occurred while creating the product." };
                 }
             },
+
+              // Publish a new product
+              setOrder: async (cart) => {
+                try {
+
+                    const token = getStore().token;
+                    if (!token) {
+                        console.error("Token not found. Please log in.");
+                        return { success: false, message: "User token not available." };
+                    }
+
+                    const response = await fetch(process.env.BACKEND_URL + "/api/orders", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" , 
+                                    "Authorization": `Bearer ${getStore().token}`
+                                },
+                        body: JSON.stringify({
+                            cart:cart,
+                            user_id: 1, 
+                        }),
+                    });
+                    console.log("Item added to cart:", cart);
+   
+                    if (!response.ok) {
+                        const data = await response.json();
+                        return { success: false, message: data.message || "Failed to publish ORDER." };
+                    }
+   
+                    return { success: true, message: "ORDER created successfully." };
+                } catch (error) {
+                    console.error("Error during API call:", error);
+                    return { success: false, message: "An error occurred while creating the ORDER." };
+                }
+            },
    
             // Action to fetch products
             getProducts: async () => {

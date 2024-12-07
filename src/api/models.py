@@ -74,9 +74,10 @@ class Order(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     date = db.Column(db.DateTime, nullable=False)
     status = db.Column(db.String(50), nullable=False, default="Pending")
+    order_number = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
-        return f'<Order {self.id} - User {self.user_id} - Product {self.product_id}>'
+        return f'<Order {self.id} - User {self.user_id} - Product {self.product_id}> - OrderNumber {self.order_number}>'
 
     def serialize(self):
         return {
@@ -85,5 +86,6 @@ class Order(db.Model):
             "product": self.product.serialize(),
             "quantity": self.quantity,
             "date": self.date.isoformat(),
-            "status": self.status
+            "status": self.status,
+            "order_number": self.order_number,
         }
