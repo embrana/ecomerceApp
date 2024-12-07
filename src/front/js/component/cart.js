@@ -34,84 +34,118 @@ const Cart = () => {
     }, [store.cart]);
 
     return (
-        <div className="container my-4">
-            <div className="row border">
-                <div className="col-xs-8">
-                    <div className="panel panel-info mt-2">
-                        <div className="panel-heading">
-                            <div className="panel-title">
-                                <div className="row">
-                                    <div className="col-6">
-                                        <p className="fs-4 fw-bold"><i className="fa-solid fa-cart-shopping"></i> Shopping Cart</p>
-                                    </div>
-                                </div>
-                            </div>
+<div className="container my-4">
+    <div className="row border">
+        <div className="col-12">
+            <div className="panel panel-info mt-2">
+                <div className="panel-heading">
+                    <div className="panel-title">
+                        <div className="row">
+                            <p className="fs-5 fw-bold">
+                                <i className="fa-solid fa-cart-shopping"></i> Shopping Cart
+                            </p>
                         </div>
+                    </div>
+                </div>
 
-                        <div className="panel-body mt-2">
-                            {store.cart.length > 0 ? (
-                                store.cart.map((item, index) => (
-                                    <div className="row" key={index}>
-                                        <div className="col-2">
-                                            <img className="img-responsive" src="http://placehold.it/100x70" alt="Product"/>
-                                        </div>
-                                        <div className="col-4">
-                                            <h4 className="product-name"><strong>{item.name}</strong></h4>
-                                            <h4><small>Product description</small></h4>
-                                            <div className="row">
-                                                <div className="col-4">
-                                                    <p className="product-name fs-4">Product name</p>
-                                                </div>
-                                                <div className="col-6 row">
-                                                    <div className="col-6 text-end">
-                                                        <p className="fs-5 text">${item.price} <span className="text-muted">x</span></p>
-                                                    </div>
-                                                    <div className="col-4">
-                                                        <input 
-                                                            type="number" 
-                                                            className="form-control input-sm" 
-                                                            value={quantities[index] || 1}  // Ensure value is always a number
-                                                            onChange={(e) => handleQuantityChange(index, Number(e.target.value))}
-                                                            min="1"
-                                                        />
-                                                    </div>
-                                                    <div className="col-2">
-                                                        <button 
-                                                            type="button" 
-                                                            className="btn btn-link btn-xs" 
-                                                            onClick={() => actions.removeFromCart(index)}
-                                                        >
-                                                            <i className="fa-solid fa-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <li className="dropdown-item text-muted">Your cart is empty</li>
-                            )}
-                        </div>
-
-                        <div className="panel-footer mb-2">
-                            <div className="row text-center">
-                                <div className="col-9">
-                                    <h4 className="text-right">
-                                        Total <strong>${store.cart.reduce((total, item, index) => total + item.price * (quantities[index] || 1), 0)}</strong>
-                                    </h4>
+                <div className="panel-body mt-2">
+                    {store.cart.length > 0 ? (
+                        store.cart.map((item, index) => (
+                            <div className="d-flex align-items-center border-bottom py-2" key={index}>
+                                {/* Imagen del producto */}
+                                <div className="flex-shrink-0 me-3">
+                                    <img
+                                        className="img-fluid"
+                                        src={item.image || "https://via.placeholder.com/150x100"}
+                                        alt="Product"
+                                        style={{ width: "75px", height: "50px", objectFit: "cover" }}
+                                    />
                                 </div>
-                                <div className="col-3">
-                                    <button type="button" className="btn btn-success btn-block" onClick={() => actions.setOrder()}>
-                                        Checkout
+
+                                {/* Nombre del producto */}
+                                <div className="flex-grow-1 text-truncate me-3">
+                                    <h6 className="product-name mb-0" style={{ fontSize: "0.9rem" }}>
+                                        {item.name}
+                                    </h6>
+                                </div>
+
+                                {/* Precio */}
+                                <div className="me-3" style={{ fontSize: "0.9rem" }}>
+                                    ${item.price}
+                                </div>
+
+                                {/* Selector de cantidad */}
+                                <div className="d-flex align-items-center me-3">
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary btn-sm"
+                                        onClick={() =>
+                                            handleQuantityChange(index, Math.max(1, (quantities[index] || 1) - 1))
+                                        }
+                                    >
+                                        -
+                                    </button>
+                                    <input
+                                        type="number"
+                                        className="form-control form-control-sm text-center mx-1"
+                                        value={quantities[index] || 1}
+                                        onChange={(e) =>
+                                            handleQuantityChange(index, Math.max(1, Number(e.target.value)))
+                                        }
+                                        min="1"
+                                        style={{ width: "50px" }}
+                                    />
+                                    <button
+                                        type="button"
+                                        className="btn btn-outline-secondary btn-sm"
+                                        onClick={() =>
+                                            handleQuantityChange(index, (quantities[index] || 1) + 1)
+                                        }
+                                    >
+                                        +
+                                    </button>
+                                </div>
+
+                                {/* Botón para eliminar */}
+                                <div>
+                                    <button
+                                        type="button"
+                                        className="btn btn-link btn-sm text-danger"
+                                        onClick={() => actions.removeFromCart(index)}
+                                    >
+                                        <i className="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
                             </div>
+                        ))
+                    ) : (
+                        <p className="text-muted">Your cart is empty</p>
+                    )}
+                </div>
+
+                {/* Footer del carrito */}
+                <div className="panel-footer mt-3">
+                    <div className="row">
+                        <div className="col-8">
+                            <h5 className="text-end" style={{ fontSize: "1rem" }}>
+                                Total: <strong>${store.cart.reduce((total, item, index) => total + item.price * (quantities[index] || 1), 0)}</strong>
+                            </h5>
+                        </div>
+                        <div className="col-4 text-end">
+                            <button
+                                type="button"
+                                className="btn btn-success"
+                                onClick={() => actions.setOrder()}
+                            >
+                                Checkout
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
     );
 };
 
