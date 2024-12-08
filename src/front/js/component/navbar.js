@@ -21,6 +21,12 @@ export const Navbar = () => {
                 <div className="ml-auto d-flex align-items-center">
                     {/* Cart Dropdown */}
                     <div className={`dropdown me-3 ${!isLoggedIn ? 'd-none' : ''}`}>
+                    <Link to="/menu">
+                            <button className="btn btn-light me-2">Menu</button>
+                        </Link>
+                    <Link to="/reserve">
+                            <button className="btn btn-light me-2">Comedor</button>
+                        </Link>
                         <button
                             className="btn btn-light dropdown-toggle"
                             type="button"
