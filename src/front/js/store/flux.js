@@ -81,6 +81,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             } catch (error) {
                 console.error("Error fetching orders:", error);
                 setStore({ orders: [] });
+                sessionStorage.getItem("auth_token")
             }
         },
 
@@ -107,38 +108,53 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false, message: "An error occurred while creating the product." };
                 }
             },
-              setOrder: async (cart) => {
+          
+            setOrder: async (cart) => {
+                console.log("Cart data received:", cart);
                 try {
-
                     const token = getStore().token;
+                    const cart = getStore().cart;
+                   sessionStorage.getItem("auth_token")
+                     console.log(token);
+                     console.log("Cart data received:", cart);
+            
                     if (!token) {
                         console.error("Token not found. Please log in.");
                         return { success: false, message: "User token not available." };
                     }
-
-                    const response = await fetch(process.env.BACKEND_URL + "/api/orders", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" , 
-                                    "Authorization": `Bearer ${getStore().token}`
-                                },
-                        body: JSON.stringify({
-                            cart:cart,
-                            user_id: 1, 
-                        }),
-                    });
-                    console.log("Item added to cart:", cart);
-   
-                    if (!response.ok) {
-                        const data = await response.json();
-                        return { success: false, message: data.message || "Failed to publish ORDER." };
+            
+                    // Verifica que el carrito tenga la estructura correcta
+                    if (!Array.isArray(cart) || cart.length === 0 || !cart.every(item => item.product_id && item.quantity)) {
+                        console.error("Invalid cart structure. Each item must have product_id and quantity.");
+                        console.log("Cart structure received:", cart);
+                        return { success: false, message: "Cart must contain valid product_id and quantity." };
                     }
-   
-                    return { success: true, message: "ORDER created successfully." };
+            
+                    // Llamada a la API
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/orders`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ cart }),
+                    });
+            
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error("API Error:", errorData);
+                        return { success: false, message: errorData.msg || "Failed to create ORDER." };
+                    }
+            
+                    const data = await response.json();
+                    console.log("Order created successfully:", data);
+                    return { success: true, message: data.msg || "ORDER created successfully.", orderNumber: data.order_number };
                 } catch (error) {
                     console.error("Error during API call:", error);
                     return { success: false, message: "An error occurred while creating the ORDER." };
                 }
             },
+            
             getProducts: async () => {
                 try {
                     const response = await fetch(process.env.BACKEND_URL + "/api/products");
@@ -157,19 +173,48 @@ const getState = ({ getStore, getActions, setStore }) => {
                     console.error("Error fetching products:", error);
                 }
             },
-            addToCart: (item) => {
+           
+            addToCart: (product) => {
                 const store = getStore();
-                const updatedCart = [...store.cart, item];
+            
+                // Encuentra si el producto ya está en el carrito
+                const existingItem = store.cart.find(item => item.product_id === product.id);
+                if (existingItem) {
+                    // Si ya está, aumenta la cantidad
+                    existingItem.quantity += 1;
+                } else {
+                    // Si no está, agrégalo con `product_id` y `quantity`
+                    const newItem = {
+                        product_id: product.id, // Usa `id` del producto como `product_id`
+                        quantity: 1, // Inicializa con cantidad 1
+                        name: product.name, // Puedes añadir otros campos opcionales si lo necesitas
+                        price: product.price
+                    };
+                    store.cart.push(newItem);
+                }
+            
+                // Actualiza el store
+                const updatedCart = [...store.cart];
                 setStore({ cart: updatedCart });
+            
+                // Guarda el carrito en localStorage
                 localStorage.setItem("cart", JSON.stringify(updatedCart));
-                console.log("Item added to cart:", item);
+            
+                console.log("Cart updated:", updatedCart);
             },
+            
+
             initializeCart: () => {
                 const savedCart = localStorage.getItem("cart");
                 if (savedCart) {
                     setStore({ cart: JSON.parse(savedCart) });
                 }
             },
+              // Función para actualizar el carrito
+              setCart: updatedCart => {
+                setStore({ cart: updatedCart });
+            },
+
             removeFromCart: (index) => {
                 const store = getStore();
                 const updatedCart = store.cart.filter((_, i) => i !== index);

@@ -167,8 +167,10 @@ def create_order():
         return jsonify({"msg": "Cart must be a non-empty list"}), 400
 
     # Validate required fields
-    if not cart or "product_id" not in cart or "quantity" not in cart:
-        return jsonify({"msg": "Missing product_id or quantity"}), 400
+    # if not cart or "product_id" not in cart or "quantity" not in cart:
+    #     return jsonify({"msg": "Missing product_id or quantity"}), 400
+    if not all(isinstance(item, dict) and "product_id" in item and "quantity" in item for item in cart):
+        return jsonify({"msg": "Each cart item must have product_id and quantity"}), 400
 
     # Generate a unique order number for the cart
     order_number = f"{user.id}-{int(datetime.now().timestamp() * 1000)}"
