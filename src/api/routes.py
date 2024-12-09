@@ -78,13 +78,14 @@ def create_product():
     body = request.form
 
     # Validate required fields
-    if not body or "name" not in body or "description" not in body or "type" not in body or "stock" not in body:
+    if not body or "name" not in body or "description" not in body or "type" not in body or "stock" not in body or "price" not in body:
         raise APIException("Missing product field", status_code=400)
 
     name = body.get("name")
     description = body.get("description")
     type = body.get("type")
     stock = body.get("stock")
+    price = body.get("price")
 
     # Log the received stock value for debugging
     print(f"Received stock value: {stock}")
@@ -113,7 +114,8 @@ def create_product():
         type=type,
         stock=stock,
         is_active=True,  # Default to True for new products
-        image=image_url
+        image=image_url,
+        price=price
     )
     db.session.add(new_product)
     db.session.commit()
@@ -157,45 +159,59 @@ def create_order():
 
     if not user:
         return jsonify({"msg": "User not found"}), 404
-
+    
     body = request.get_json()
 
+    cart = body.get("cart")  # List of cart items
+    if not isinstance(cart, list) or len(cart) == 0:
+        return jsonify({"msg": "Cart must be a non-empty list"}), 400
+
     # Validate required fields
-    if not body or "product_id" not in body or "quantity" not in body:
-        return jsonify({"msg": "Missing product_id or quantity"}), 400
+    # if not cart or "product_id" not in cart or "quantity" not in cart:
+    #     return jsonify({"msg": "Missing product_id or quantity"}), 400
+    if not all(isinstance(item, dict) and "product_id" in item and "quantity" in item for item in cart):
+        return jsonify({"msg": "Each cart item must have product_id and quantity"}), 400
 
-    product_id = body.get("product_id")
-    quantity = body.get("quantity")
+    # Generate a unique order number for the cart
+    order_number = f"{user.id}-{int(datetime.now().timestamp() * 1000)}"
 
-    # Validate quantity
-    if not isinstance(quantity, int) or quantity <= 0:
-        return jsonify({"msg": "Quantity must be a positive integer"}), 400
-
-    # Fetch product and check availability
-    product = Product.query.get(product_id)
-    if not product:
-        return jsonify({"msg": "Product not found"}), 404
-
-    if product.stock < quantity:
-        return jsonify({"msg": "Insufficient stock"}), 400
-
-    # Deduct stock and create the order
     try:
-        product.stock -= quantity
-        order = Order(
-            user_id=user.id,  # Use the user ID
-            product_id=product_id,
-            quantity=quantity,
-            date=datetime.now(timezone.utc),  # Use timezone-aware datetime
-            status="Pending"  # Default status
-        )
-        db.session.add(order)
-        db.session.commit()
+    # Deduct stock and create the order
+        for item in cart:
+            product_id = item.get("product_id")
+            # quantity = item.get("quantity")
+            quantity = 1
 
-        return jsonify({"msg": "Order created successfully", "order": order.serialize()}), 201
+            # Validate product and quantity
+            product = Product.query.get(product_id)
+            if not product:
+                return jsonify({"msg": f"Product with ID {product_id} not found"}), 404
+
+            if product.stock < quantity:
+                return jsonify({"msg": f"Insufficient stock for product {product_id}"}), 400
+
+            # Deduct stock and create an order
+            product.stock -= quantity
+            order = Order(
+                user_id=user.id,
+                product_id=product_id,
+                quantity= quantity,
+                date=datetime.now(timezone.utc),
+                status="Pending",
+                order_number=order_number  # Assign the same order number
+            )
+            db.session.add(order)
+
+        db.session.commit()
+        return jsonify({"msg": "Order created successfully", "order_number": order_number}), 201
+
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": f"Failed to create order: {str(e)}"}), 500
+
+
+
+
     
 @api.route('/orders', methods=['GET'])
 def get_all_orders():

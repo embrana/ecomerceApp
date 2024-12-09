@@ -3,7 +3,6 @@ import Card from "../component/card";
 import { Context } from "../store/appContext";
 import Cart from "../component/cart";
 
-
 export const Menu = () => {
     const { store, actions } = useContext(Context);
 
@@ -11,59 +10,51 @@ export const Menu = () => {
         actions.getProducts();
     }, []);
 
-    const type1Products = store.products.filter(product => product.type === "Menu Ejecutivo");
-    const type2Products = store.products.filter(product => product.type === "Minutas");
-    const type3Products = store.products.filter(product => product.type === "Bebidas");
+    // Categorías de productos
+    const categories = [
+        { type: "Menu Ejecutivo", title: "Menu Ejecutivo", color: "primary" },
+        { type: "Minutas", title: "Minutas", color: "success" },
+        { type: "Bebidas", title: "Bebidas", color: "info" },
+    ];
 
     return (
-        <div className="container d-flex">
-        <div className="container my-5">
-            <div className="mb-5">
-                <h2 className="text-center text-primary mb-4">Menu Ejecutivo</h2>
-                <div className="row g-4">
-                    {type1Products.length > 0 ? (
-                        type1Products.map((product, index) => (
-                            <div className="col-md-4" key={index}>
-                                <Card item={product} />
-                            </div>
-                        ))
-                    ) : (
-                        <p className="text-muted text-center">No products available for this type</p>
-                    )}
-                </div>
-            </div>
+        <div className="container-fluid my-5">
+            <div className="row">
+                {/* Sección de Productos */}
+                <div className="col-lg-8">
+                    {categories.map((category, idx) => {
+                        const filteredProducts = store.products.filter(
+                            (product) => product.type === category.type
+                        );
 
-            <div className="mb-5">
-                <h2 className="text-center text-success mb-4">Minutas</h2>
-                <div className="row g-4">
-                    {type2Products.length > 0 ? (
-                        type2Products.map((product, index) => (
-                            <div className="col-md-4" key={index}>
-                                <Card item={product}></Card> 
+                        return (
+                            <div className="mb-5" key={idx}>
+                                <h2 className={`text-center text-${category.color} mb-4`}>
+                                    {category.title}
+                                </h2>
+                                <div className="row g-4">
+                                    {filteredProducts.length > 0 ? (
+                                        filteredProducts.map((product, index) => (
+                                            <div className="col-sm-6 col-md-4" key={index}>
+                                                <Card item={product} />
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-muted text-center">
+                                            No products available for this category
+                                        </p>
+                                    )}
+                                </div>
                             </div>
-                        ))
-                    ) : (
-                        <p className="text-muted text-center">No products available for this type</p>
-                    )}
+                        );
+                    })}
                 </div>
-            </div>
 
-            <div className="mb-5">
-                <h2 className="text-center text-info mb-4">Bebidas</h2>
-                <div className="row g-4">
-                    {type3Products.length > 0 ? (
-                        type3Products.map((product, index) => (
-                            <div className="col-md-4" key={index}>
-                                <Card item={product} />
-                            </div>
-                        ))
-                    ) : (
-                        <p className="text-muted text-center">No products available for this type</p>
-                    )}
+                {/* Sección del Carrito */}
+                <div className="col-lg-4">
+                    <Cart />
                 </div>
             </div>
-        </div>
-            <Cart/>
         </div>
     );
 };

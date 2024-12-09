@@ -1,0 +1,56 @@
+.responsive-btn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px;
+    background-color: #ff5722;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+    .responsive-btn {
+        display: block;
+    }
+
+    .checkout {
+        display: block;
+        position: fixed;
+        bottom: 15%;
+        right: 20px;
+        background-color: #fff;
+       }
+
+       .checkout1 {
+        display: none;
+       }
+    
+       .checkout {
+        display: none;
+        border-radius: 5px;
+       }
+
+       .cardC {
+        width: 200px;
+    } 
+}
+
+@media (min-width: 769px) {
+    .responsive-btn {
+        display: none;
+    }
+
+    .checkout1 {
+        display: block;
+       }
+    
+       .checkout {
+        display: none;
+       }
+
+    
+}

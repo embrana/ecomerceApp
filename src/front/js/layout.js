@@ -4,6 +4,7 @@ import ScrollToTop from "./component/scrollToTop";
 import { BackendURL } from "./component/backendURL";
 
 
+
 import { Home } from "./pages/home";
 import { Single } from "./pages/single";
 import injectContext from "./store/appContext";
@@ -18,6 +19,7 @@ import EditMenu from "./pages/editMenu";
 import Menu from "./pages/menu";
 import Reserve from "./pages/reserve";
 
+import { CheckOut } from "./pages/checkout";
 
 import ProtectedRoute from "./component/protectedRoute";
 import Cart from "./component/cart";
@@ -68,6 +70,11 @@ const Layout = () => {
                                 <Reserve />
                             </ProtectedRoute>
                         } />
+                        <Route path="/checkout" element={
+                            <ProtectedRoute>
+                                <CheckOut />
+                            </ProtectedRoute>
+                        } />
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
@@ -75,7 +82,8 @@ const Layout = () => {
                 </ScrollToTop>
             </BrowserRouter>
         </div>
-    );
+    ); 
+    
 };
 
 export default injectContext(Layout);

@@ -1,110 +1,199 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
+import "../../styles/cart.css";
+
+function toggleCheckout() {
+    const checkoutSection = document.querySelector(".checkout");
+    if (checkoutSection.style.display === "block") {
+        checkoutSection.style.display = "none";
+    } else {
+        checkoutSection.style.display = "block";
+    }
+}
 
 const Cart = () => {
     const { store, actions } = useContext(Context);
-    
-    // Initialize quantities with default values based on the cart items
-    const [quantities, setQuantities] = useState(
-        store.cart.reduce((acc, item, index) => {
-            acc[index] = 1; // Set a default quantity of 1
-            return acc;
-        }, {})
-    );
 
-    // Handle quantity change
-    const handleQuantityChange = (index, value) => {
-        setQuantities((prevQuantities) => ({
-            ...prevQuantities,
-            [index]: value,
-        }));
+    const handleQuantityChange = (productId, value) => {
+        if (value < 1) return;
+    
+        const updatedCart = store.cart.map((item) =>
+            item.product_id === productId ? { ...item, quantity: value } : item
+        );
+    
+        actions.setCart(updatedCart);
+        console.log(updatedCart)
     };
 
-    // Ensure quantities are set properly when the cart updates
-    useEffect(() => {
-        setQuantities((prevQuantities) => {
-            return store.cart.reduce((acc, item, index) => {
-                if (prevQuantities[index] === undefined) {
-                    acc[index] = 1; // Default to 1 if not set yet
-                }
-                return acc;
-            }, prevQuantities);
-        });
-    }, [store.cart]);
+    const handleRemove = (index) => {
+        const updatedCart = state.store.cart.filter((_, i) => i !== index);
+        setCart(updatedCart);
+    };
+
+    // Lógica compartida para ambas versiones del carrito (checkout y checkout1)
+    const renderCartItems = () => {
+        if (store.cart.length === 0) {
+            return <p className="text-muted text-center">Your cart is empty</p>;
+        }
+
+        return store.cart.map((item) => (
+            <div
+                className="d-flex align-items-center border-bottom py-2"
+                key={item.product_id}
+                style={{ fontSize: "0.9rem" }}
+            >
+                {/* Imagen del producto */}
+                <div className="flex-shrink-0" style={{ width: "60px" }}>
+                    <img
+                        className="img-fluid"
+                        src={item.image || "https://via.placeholder.com/150x100"}
+                        alt="Product"
+                        style={{
+                            width: "60px",
+                            height: "40px",
+                            objectFit: "cover",
+                        }}
+                    />
+                </div>
+
+                {/* Nombre y precio del producto */}
+                <div className="flex-grow-1 ms-2">
+                    <h6 className="mb-1 text-truncate">{item.name}</h6>
+                    <p className="mb-0 text-muted">${item.price}</p>
+                </div>
+
+                {/* Selector de cantidad */}
+                <div className="d-flex align-items-center">
+                    <button
+                        type="button"
+                        className="btn btn-outline-secondary btn-sm"
+                        onClick={() =>
+                            handleQuantityChange(item.product_id, item.quantity - 1)
+                        }
+                    >
+                        -
+                    </button>
+                    <input
+                        type="number"
+                        className="form-control form-control-sm text-center mx-1"
+                        value={item.quantity}
+                        onChange={(e) =>
+                            handleQuantityChange(item.product_id, Math.max(1, Number(e.target.value)))
+                        }
+                        min="1"
+                        style={{ width: "50px" }}
+                    />
+                    <button
+                        type="button"
+                        className="btn btn-outline-secondary btn-sm"
+                        onClick={() =>
+                            handleQuantityChange(item.product_id, item.quantity + 1)
+                        }
+                    >
+                        +
+                    </button>
+                </div>
+
+                {/* Botón para eliminar */}
+                <div className="ms-2">
+                    <button
+                        type="button"
+                        className="btn btn-link btn-sm text-danger"
+                        onClick={() => handleRemove(item.product_id)}
+                    >
+                        <i className="fa-solid fa-trash"></i>
+                    </button>
+                     {/* <button
+                        type="button"
+                        className="btn btn-link btn-sm text-danger"
+                        onClick={() => actions.removeFromCart(index)}
+                      >
+                        <i className="fa-solid fa-trash"></i>
+                     </button> */}
+                </div>
+            </div>
+        ));
+    };
 
     return (
-        <div className="container my-4">
-            <div className="row border">
-                <div className="col-xs-8">
+        <div className="container my-4" style={{ maxWidth: "400px", margin: "0 auto" }}>
+            <button className="responsive-btn" onClick={toggleCheckout}>
+                Cart
+            </button>
+            {/* Checkout para escritorio */}
+            <div className="row border checkout">
+                <div className="col-12">
                     <div className="panel panel-info mt-2">
                         <div className="panel-heading">
-                            <div className="panel-title">
-                                <div className="row">
-                                    <div className="col-6">
-                                        <p className="fs-4 fw-bold"><i className="fa-solid fa-cart-shopping"></i> Shopping Cart</p>
-                                    </div>
+                            <div className="panel-title text-center">
+                                <p className="fs-5 fw-bold">
+                                    <i className="fa-solid fa-cart-shopping"></i> Shopping Cart
+                                </p>
+                            </div>
+                        </div>
+                        <div className="panel-body mt-2">{renderCartItems()}</div>
+                        <div className="panel-footer mt-3">
+                            <div className="row align-items-center">
+                                <div className="col-6 text-start">
+                                    <h5 style={{ fontSize: "1rem" }}>
+                                        Total:{" "}
+                                        <strong>
+                                            $
+                                            {store.cart.reduce(
+                                                (total, item) =>
+                                                    total + item.price * item.quantity,
+                                                0
+                                            )}
+                                        </strong>
+                                    </h5>
+                                </div>
+                                <div className="col-6 text-end">
+                                    <Link to={"/checkout"}>
+                                        <button type="button" className="btn btn-success">
+                                            Pagar
+                                        </button>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
 
-                        <div className="panel-body mt-2">
-                            {store.cart.length > 0 ? (
-                                store.cart.map((item, index) => (
-                                    <div className="row" key={index}>
-                                        <div className="col-2">
-                                            <img className="img-responsive" src="http://placehold.it/100x70" alt="Product"/>
-                                        </div>
-                                        <div className="col-4">
-                                            <h4 className="product-name"><strong>{item.name}</strong></h4>
-                                            <h4><small>Product description</small></h4>
-                                            <div className="row">
-                                                <div className="col-4">
-                                                    <p className="product-name fs-4">Product name</p>
-                                                </div>
-                                                <div className="col-6 row">
-                                                    <div className="col-6 text-end">
-                                                        <p className="fs-5 text">${item.price} <span className="text-muted">x</span></p>
-                                                    </div>
-                                                    <div className="col-4">
-                                                        <input 
-                                                            type="number" 
-                                                            className="form-control input-sm" 
-                                                            value={quantities[index] || 1}  // Ensure value is always a number
-                                                            onChange={(e) => handleQuantityChange(index, Number(e.target.value))}
-                                                            min="1"
-                                                        />
-                                                    </div>
-                                                    <div className="col-2">
-                                                        <button 
-                                                            type="button" 
-                                                            className="btn btn-link btn-xs" 
-                                                            onClick={() => actions.removeFromCart(index)}
-                                                        >
-                                                            <i className="fa-solid fa-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <li className="dropdown-item text-muted">Your cart is empty</li>
-                            )}
+            {/* Checkout para móvil */}
+            <div className="row border checkout1">
+                <div className="col-12">
+                    <div className="panel panel-info mt-2">
+                        <div className="panel-heading">
+                            <div className="panel-title text-center">
+                                <p className="fs-5 fw-bold">
+                                    <i className="fa-solid fa-cart-shopping"></i> Shopping Cart
+                                </p>
+                            </div>
                         </div>
-
-                        <div className="panel-footer mb-2">
-                            <div className="row text-center">
-                                <div className="col-9">
-                                    <h4 className="text-right">
-                                        Total <strong>${store.cart.reduce((total, item, index) => total + item.price * (quantities[index] || 1), 0)}</strong>
-                                    </h4>
+                        <div className="panel-body mt-2">{renderCartItems()}</div>
+                        <div className="panel-footer mt-3">
+                            <div className="row align-items-center">
+                                <div className="col-6 text-start">
+                                    <h5 style={{ fontSize: "1rem" }}>
+                                        Total:{" "}
+                                        <strong>
+                                            $
+                                            {store.cart.reduce(
+                                                (total, item) =>
+                                                    total + item.price * item.quantity,
+                                                0
+                                            )}
+                                        </strong>
+                                    </h5>
                                 </div>
-                                <div className="col-3">
-                                    <button type="button" className="btn btn-success btn-block">
-                                        Checkout
-                                    </button>
+                                <div className="col-6 text-end">
+                                    <Link to={"/checkout"}>
+                                        <button type="button" className="btn btn-success">
+                                            Pagar
+                                        </button>
+                                    </Link>
                                 </div>
                             </div>
                         </div>

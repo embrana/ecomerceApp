@@ -10,9 +10,8 @@ const DashboardCocina = () => {
   useEffect(() => {
     
     actions.getOrders();
-  }, [actions]);
+  }, []);
 
-  if (!orders.length) return <p>Loading orders...</p>;
 
   return (
     <div className="container mt-5">
@@ -62,6 +61,9 @@ const DashboardCocina = () => {
               Añadir Menu
             </button>
           </Link>
+          <Link to={"/menu"} className="ms-2">
+      <button type="submit" className="btn btn-primary">Compra Menu</button>
+      </Link>
         </div>
       </div>
       <div>

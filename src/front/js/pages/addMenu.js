@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Context } from "../store/appContext";
+import { Link } from "react-router-dom";
 
 const AddMenu = () => {
   const { actions } = useContext(Context);
@@ -10,6 +11,7 @@ const AddMenu = () => {
     stock: "",
     description: "",
     isActive: true,
+    price: "",
   });
   const [image, setImage] = useState(null);
   const [error, setError] = useState("");
@@ -27,6 +29,7 @@ const AddMenu = () => {
     formData.append("stock", menu.stock);
     formData.append("description", menu.description);
     formData.append("isActive", menu.isActive);
+    formData.append("price", menu.price);
     if (image) {
       formData.append("image", image);
     }
@@ -48,6 +51,7 @@ const AddMenu = () => {
         stock: "",
         description: "",
         isActive: true,
+        price:"",
       });
       setImage(null);
     }
@@ -85,12 +89,22 @@ const AddMenu = () => {
                 <option value="Minutas">Minutas</option>
                 <option value="Bebidas">Bebidas</option>
               </select>
+              <label>Stock</label>
               <input
                 type="number"
                 className="form-control"
                 placeholder="Stock"
                 value={menu.stock}
                 onChange={(e) => setMenu({ ...menu, stock: e.target.value })}
+                required
+              />
+              <label>Precio</label>
+               <input
+                type="number"
+                className="form-control"
+                placeholder="Precio"
+                value={menu.price}
+                onChange={(e) => setMenu({ ...menu, price: e.target.value })}
                 required
               />
             </div>
@@ -153,6 +167,12 @@ const AddMenu = () => {
           </button>
         </div>
       </form>
+      <Link to={"/dashboard/cocina"}>
+      <button type="submit" className="btn btn-primary">Volver</button>
+      </Link>
+      <Link to={"/menu"}>
+      <button type="submit" className="btn btn-primary">Compra Menu</button>
+      </Link>
     </div>
   );
 };
