@@ -20,7 +20,7 @@ export const Navbar = () => {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    return (
+return (
         <nav className="navbar navbar-light bg-primary px-0">
             <div className="container-fluid mx-0">
                 {/* Logo */}
@@ -33,43 +33,54 @@ export const Navbar = () => {
                         />
                     </span>
                 </Link>
-
+    
                 {/* Dropdown en pantallas pequeñas */}
                 {isSmallScreen ? (
                     <div className="dropdown ms-auto">
-                        <button
-                            className="btn btn-light dropdown-toggle"
-                            type="button"
-                            id="dropdownMenuButton"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                        >
-                            <span className="navbar-toggler-icon"></span>
-                        </button>
-                        <ul
-                            className="dropdown-menu dropdown-menu-end"
-                            aria-labelledby="dropdownMenuButton"
-                        >
-                            {/* Logout como categoría */}
-                            {isLoggedIn && (
-                                <li className="dropdown-item">
-                                    <button
-                                        className="btn btn-danger w-100"
-                                        onClick={() => actions.logout()}
-                                    >
-                                        Log out
-                                    </button>
-                                </li>
-                            )}
-                            {/* Opción de Login si no está autenticado */}
-                            {!isLoggedIn && (
-                                <li>
-                                    <Link to="/login" className="dropdown-item">
-                                        Login
-                                    </Link>
-                                </li>
-                            )}
-                        </ul>
+                        <div className="ml-auto d-flex align-items-center">
+                            {/* Cart Dropdown */}
+                            <div className={`dropdown me-3 ${!isLoggedIn ? "d-none" : ""}`}>
+                                <Link to="/menu">
+                                    <button className="btn btn-light me-2">Menu</button>
+                                </Link>
+                                <Link to="/reserve">
+                                    <button className="btn btn-light me-2">Comedor</button>
+                                </Link>
+                                <button
+                                    className="btn btn-light dropdown-toggle"
+                                    type="button"
+                                    id="dropdownMenuButton"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                >
+                                    <span className="navbar-toggler-icon"></span>
+                                </button>
+                                <ul
+                                    className="dropdown-menu dropdown-menu-end"
+                                    aria-labelledby="dropdownMenuButton"
+                                >
+                                    {/* Logout como categoría */}
+                                    {isLoggedIn && (
+                                        <li className="dropdown-item">
+                                            <button
+                                                className="btn btn-danger w-100"
+                                                onClick={() => actions.logout()}
+                                            >
+                                                Log out
+                                            </button>
+                                        </li>
+                                    )}
+                                    {/* Opción de Login si no está autenticado */}
+                                    {!isLoggedIn && (
+                                        <li>
+                                            <Link to="/login" className="dropdown-item">
+                                                Login
+                                            </Link>
+                                        </li>
+                                    )}
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 ) : (
                     <div className="d-flex ms-auto align-items-center">
@@ -99,9 +110,7 @@ export const Navbar = () => {
                                                 <button
                                                     className="btn btn-sm btn-danger"
                                                     onClick={() =>
-                                                        actions.removeFromCart(
-                                                            index
-                                                        )
+                                                        actions.removeFromCart(index)
                                                     }
                                                 >
                                                     Remove
@@ -116,7 +125,7 @@ export const Navbar = () => {
                                 </ul>
                             </div>
                         )}
-
+    
                         {/* Logout como botón en pantallas grandes */}
                         {isLoggedIn && (
                             <button
@@ -136,4 +145,5 @@ export const Navbar = () => {
             </div>
         </nav>
     );
-};
+}
+    
