@@ -20,31 +20,16 @@ const injectContext = PassedComponent => {
             })
         );
 
-        // Función para actualizar el carrito
-        const setCart = updatedCart => {
-            setState({
-                store: {
-                    ...state.store,
-                    cart: updatedCart
-                }
-            });
-        };
-
-        const actions = {
-            ...state.actions,
-            setCart
-        };
-
         useEffect(() => {
             /**
              * Ejecutar acciones al cargar la aplicación
              */
-            actions.initializeCart();
-            actions.getMessage();
+            state.actions.initializeCart();
+            state.actions.getMessage();
         }, []);
 
         return (
-            <Context.Provider value={{ ...state, actions }}>
+            <Context.Provider value={state}>
                 <PassedComponent {...props} />
             </Context.Provider>
         );
