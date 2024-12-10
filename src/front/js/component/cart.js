@@ -17,11 +17,11 @@ const Cart = () => {
 
     const handleQuantityChange = (productId, value) => {
         if (value < 1) return;
-    
+
         const updatedCart = store.cart.map((item) =>
             item.product_id === productId ? { ...item, quantity: value } : item
         );
-    
+
         actions.setCart(updatedCart);
         console.log(updatedCart)
     };
@@ -104,7 +104,7 @@ const Cart = () => {
                     >
                         <i className="fa-solid fa-trash"></i>
                     </button>
-                     {/* <button
+                    {/* <button
                         type="button"
                         className="btn btn-link btn-sm text-danger"
                         onClick={() => actions.removeFromCart(index)}
