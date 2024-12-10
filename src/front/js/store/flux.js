@@ -6,6 +6,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             products: [],
             cart: [],
             orders: [],  // Add orders to the store
+            reserve: [],
         },
         actions: {
             // Utility function to make API calls with common headers
