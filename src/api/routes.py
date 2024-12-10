@@ -1,5 +1,5 @@
 from flask import request, jsonify, Blueprint
-from api.models import db, User, Product, Order
+from api.models import db, User, Product, Order, OrderProduct
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from api.utils import APIException
 from datetime import datetime, timezone
@@ -167,8 +167,6 @@ def create_order():
         return jsonify({"msg": "Cart must be a non-empty list"}), 400
 
     # Validate required fields
-    # if not cart or "product_id" not in cart or "quantity" not in cart:
-    #     return jsonify({"msg": "Missing product_id or quantity"}), 400
     if not all(isinstance(item, dict) and "product_id" in item and "quantity" in item for item in cart):
         return jsonify({"msg": "Each cart item must have product_id and quantity"}), 400
 
@@ -176,11 +174,17 @@ def create_order():
     order_number = f"{user.id}-{int(datetime.now().timestamp() * 1000)}"
 
     try:
-    # Deduct stock and create the order
+        # Create the order
+        order = Order(
+            user_id=user.id,
+            order_number=order_number
+        )
+        db.session.add(order)
+
+        # Add products to the order
         for item in cart:
             product_id = item.get("product_id")
-            # quantity = item.get("quantity")
-            quantity = 1
+            quantity = item.get("quantity", 1)  # Default quantity to 1 if not provided
 
             # Validate product and quantity
             product = Product.query.get(product_id)
@@ -190,18 +194,16 @@ def create_order():
             if product.stock < quantity:
                 return jsonify({"msg": f"Insufficient stock for product {product_id}"}), 400
 
-            # Deduct stock and create an order
+            # Deduct stock
             product.stock -= quantity
-            order = Order(
-                user_id=user.id,
-                product_id=product_id,
-                quantity= quantity,
-                date=datetime.now(timezone.utc),
-                status="Pending",
-                order_number=order_number  # Assign the same order number
+            order_product = OrderProduct(
+                order_id=order.id,
+                product_id=product.id,
+                quantity=quantity
             )
-            db.session.add(order)
+            db.session.add(order_product)
 
+        # Commit the transaction
         db.session.commit()
         return jsonify({"msg": "Order created successfully", "order_number": order_number}), 201
 
