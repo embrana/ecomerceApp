@@ -7,13 +7,15 @@ const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [successMessage, setSuccessMessage] = useState(""); // State for success message
     const navigate = useNavigate(); // Initialize useNavigate
 
     const handleSubmit = async (e) => {
         e.preventDefault();
     
-        // Clear any previous errors before attempting a new login
+        // Clear any previous errors and success messages before attempting a new login
         setError("");
+        setSuccessMessage("");
     
         // Try logging in
         const { success, redirectUrl } = await actions.login(email, password);
@@ -26,10 +28,11 @@ const Login = () => {
             if (store.token) {
                 localStorage.setItem("token", store.token);
             }
-            alert("Login successful!");
+            // Show success message
+            setSuccessMessage("Login successful! Redirecting...");
     
             // Redirect to the route provided by the backend
-            navigate(redirectUrl || "/menu");
+            setTimeout(() => navigate(redirectUrl || "/menu"), 2000); // Redirect after 2 seconds
         }
     };
 
@@ -39,6 +42,8 @@ const Login = () => {
                 <h3 className="text-center mb-4">Login</h3>
                 {/* Show error message if any */}
                 {error && <div className="alert alert-danger">{error}</div>}
+                {/* Show success message if any */}
+                {successMessage && <div className="alert alert-success">{successMessage}</div>}
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
                         <label htmlFor="email" className="form-label">Email</label>
