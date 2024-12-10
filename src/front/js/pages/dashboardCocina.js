@@ -20,22 +20,26 @@ const DashboardCocina = () => {
 
   return (
     <div className="container mt-5">
-      <h1 className="mb-2">Listado De Menus</h1>
-      <div className="d-flex justify-content-between mt-4 p-5">
-        <div className="d-flex">
-          <button
-            className="btn btn-secondary dropdown-toggle me-2"
-            type="button"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            Action
-          </button>
-          <ul className="dropdown-menu">
-            <li><button className="dropdown-item">Action</button></li>
-            <li><button className="dropdown-item">Another action</button></li>
-            <li><button className="dropdown-item">Something else here</button></li>
-          </ul>
+      <h1 className="mb-2 text-center">Listado De Menus</h1>
+      
+      {/* Action and Search Section */}
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 p-3">
+        <div className="d-flex flex-wrap mb-3 mb-md-0">
+          <div className="dropdown me-2">
+            <button
+              className="btn btn-secondary dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Action
+            </button>
+            <ul className="dropdown-menu">
+              <li><button className="dropdown-item">Action</button></li>
+              <li><button className="dropdown-item">Another action</button></li>
+              <li><button className="dropdown-item">Something else here</button></li>
+            </ul>
+          </div>
           <form className="d-flex justify-content-start" role="search">
             <input
               className="form-control me-2"
@@ -46,17 +50,19 @@ const DashboardCocina = () => {
             <button className="btn btn-primary" type="submit">Buscar</button>
           </form>
         </div>
-        <div>
+        <div className="d-flex">
           <Link to="/add/menu">
-            <button className="btn btn-primary">Añadir Menu</button>
+            <button className="btn btn-primary me-2">Añadir Menu</button>
           </Link>
-          <Link to="/menu" className="ms-2">
+          <Link to="/menu">
             <button className="btn btn-primary">Compra Menu</button>
           </Link>
         </div>
       </div>
-      <div>
-        <table className="table table-secondary table-striped mt-3">
+
+      {/* Orders Table */}
+      <div className="table-responsive mt-3">
+        <table className="table table-secondary table-striped">
           <thead>
             <tr>
               <th>
@@ -107,7 +113,7 @@ const DashboardCocina = () => {
                           />
                         </td>
                         <td>{`$${product.price || 0}`}</td>
-                        <td>{product.quantity || 1}</td> {/* Display product quantity */}
+                        <td>{product.quantity || 1}</td>
                       </tr>
                     ))
                   ) : (
