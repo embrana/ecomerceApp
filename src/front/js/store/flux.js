@@ -113,6 +113,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 console.log("Cart data received:", cart);
                 try {
                     const token = getStore().token;
+                    const cart = getStore().cart;
                    sessionStorage.getItem("auth_token")
                      console.log(token);
                      console.log("Cart data received:", cart);
