@@ -84,47 +84,7 @@ return (
                     </div>
                 ) : (
                     <div className="d-flex ms-auto align-items-center">
-                        {/* Cart solo en pantallas grandes */}
-                        {isLoggedIn && (
-                            <div className="dropdown me-3">
-                                <button
-                                    className="btn btn-light dropdown-toggle"
-                                    type="button"
-                                    id="cartDropdown"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
-                                >
-                                    Cart ({store.cart.length})
-                                </button>
-                                <ul
-                                    className="dropdown-menu dropdown-menu-end"
-                                    aria-labelledby="cartDropdown"
-                                >
-                                    {store.cart.length > 0 ? (
-                                        store.cart.map((item, index) => (
-                                            <li
-                                                key={index}
-                                                className="dropdown-item d-flex justify-content-between align-items-center"
-                                            >
-                                                <span>{item.name}</span>
-                                                <button
-                                                    className="btn btn-sm btn-danger"
-                                                    onClick={() =>
-                                                        actions.removeFromCart(index)
-                                                    }
-                                                >
-                                                    Remove
-                                                </button>
-                                            </li>
-                                        ))
-                                    ) : (
-                                        <li className="dropdown-item text-muted">
-                                            Your cart is empty
-                                        </li>
-                                    )}
-                                </ul>
-                            </div>
-                        )}
+                        
     
                         {/* Logout como botón en pantallas grandes */}
                         {isLoggedIn && (
