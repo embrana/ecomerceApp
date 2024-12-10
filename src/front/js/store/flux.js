@@ -5,7 +5,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             error: null,
             products: [],
             cart: [],
-            orders: [],  // Add orders to the store
+            orders: [],
             reserve: [],
         },
         actions: {
@@ -16,7 +16,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     "Content-Type": "application/json",
                     ...(token && { "Authorization": `Bearer ${token}` }),
                 };
-   
+
                 const response = await fetch(url, { ...options, headers });
                 if (!response.ok) {
                     const errorData = await response.json();
@@ -24,69 +24,75 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
                 return response.json();
             },
-   
-            // Login action
-         login: async (email, password) => {
-            try {
-                const response = await fetch(process.env.BACKEND_URL + "/api/login", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password }),
-                });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    setStore({ error: errorData.msg });
+            // Consolidate cart items to remove duplicates and sum quantities
+            consolidateCart: (cart) => {
+                return cart.reduce((acc, item) => {
+                    const existing = acc.find(i => i.product_id === item.product_id);
+                    if (existing) {
+                        existing.quantity += item.quantity;
+                    } else {
+                        acc.push({ ...item });
+                    }
+                    return acc;
+                }, []);
+            },
+
+            // Login action
+            login: async (email, password) => {
+                try {
+                    const response = await fetch(process.env.BACKEND_URL + "/api/login", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email, password }),
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        setStore({ error: errorData.msg });
+                        return { success: false };
+                    }
+
+                    const data = await response.json();
+                    sessionStorage.setItem("auth_token", data.token);
+                    setStore({ token: data.token, error: null });
+
+                    return { success: true, redirectUrl: data.redirect_url };
+                } catch (error) {
+                    console.error("Login error:", error);
+                    setStore({ error: "Network error. Please try again." });
                     return { success: false };
                 }
+            },
 
-                const data = await response.json();
-                sessionStorage.setItem("auth_token", data.token); // Store token in sessionStorage
-                setStore({ token: data.token, error: null });
+            logout: () => {
+                sessionStorage.removeItem("auth_token");
+                setStore({
+                    token: null,
+                    cart: [],
+                    orders: [],
+                    products: [],
+                    error: null,
+                });
+                console.log("User logged out.");
+            },
 
-                return { success: true, redirectUrl: data.redirect_url };
-            } catch (error) {
-                console.error("Login error:", error);
-                setStore({ error: "Network error. Please try again." });
-                return { success: false };
-            }
-        },
-
-        logout: () => {
-            // Clear the token from sessionStorage
-            sessionStorage.removeItem("auth_token");
-
-            // Reset the store values
-            setStore({
-                token: null,
-                cart: [],
-                orders: [],
-                products: [],
-                error: null,
-            });
-
-            console.log("User logged out.");
-        },
-   
-            // Get orders
-         getOrders: async () => {
-            try {
-                const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/orders");  // Adjust API URL
-                // If successful, update the store with the fetched orders
-                if (data && Array.isArray(data.orders)) {
-                    setStore({ orders: data.orders });
-                } else {
-                    console.error("Unexpected response format:", data);
+            // Fetch orders
+            getOrders: async () => {
+                try {
+                    const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/orders");
+                    if (data && Array.isArray(data.orders)) {
+                        setStore({ orders: data.orders });
+                    } else {
+                        console.error("Unexpected response format:", data);
+                        setStore({ orders: [] });
+                    }
+                } catch (error) {
+                    console.error("Error fetching orders:", error);
                     setStore({ orders: [] });
                 }
-            } catch (error) {
-                console.error("Error fetching orders:", error);
-                setStore({ orders: [] });
-                sessionStorage.getItem("auth_token")
-            }
-        },
+            },
 
-   
             // Publish a new product
             publishProduct: async (formData) => {
                 try {
@@ -95,125 +101,105 @@ const getState = ({ getStore, getActions, setStore }) => {
                         headers: {
                             "Authorization": `Bearer ${getStore().token}`,
                         },
-                        body: formData, // FormData object
+                        body: formData,
                     });
-   
+
                     if (!response.ok) {
                         const data = await response.json();
                         return { success: false, message: data.message || "Failed to publish product." };
                     }
-   
+
                     return { success: true, message: "Product created successfully." };
                 } catch (error) {
                     console.error("Error during API call:", error);
                     return { success: false, message: "An error occurred while creating the product." };
                 }
             },
-          
-            setOrder: async (cart) => {
-                console.log("Cart data received:", cart);
+
+            // Place an order
+            setOrder: async () => {
+                const store = getStore();
+                const consolidatedCart = getActions().consolidateCart(store.cart);
+
+                console.log("Consolidated cart data:", consolidatedCart);
                 try {
-                    const token = getStore().token;
-                    const cart = getStore().cart;
-                   sessionStorage.getItem("auth_token")
-                     console.log(token);
-                     console.log("Cart data received:", cart);
-            
+                    const token = store.token;
                     if (!token) {
                         console.error("Token not found. Please log in.");
                         return { success: false, message: "User token not available." };
                     }
-            
-                    // Verifica que el carrito tenga la estructura correcta
-                    if (!Array.isArray(cart) || cart.length === 0 || !cart.every(item => item.product_id && item.quantity)) {
-                        console.error("Invalid cart structure. Each item must have product_id and quantity.");
-                        console.log("Cart structure received:", cart);
-                        return { success: false, message: "Cart must contain valid product_id and quantity." };
-                    }
-            
-                    // Llamada a la API
+
                     const response = await fetch(`${process.env.BACKEND_URL}/api/orders`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            "Authorization": `Bearer ${token}`
+                            "Authorization": `Bearer ${token}`,
                         },
-                        body: JSON.stringify({ cart }),
+                        body: JSON.stringify({ cart: consolidatedCart }),
                     });
-            
+
                     if (!response.ok) {
                         const errorData = await response.json();
                         console.error("API Error:", errorData);
-                        return { success: false, message: errorData.msg || "Failed to create ORDER." };
+                        return { success: false, message: errorData.msg || "Failed to create order." };
                     }
-            
+
                     const data = await response.json();
                     console.log("Order created successfully:", data);
-                    return { success: true, message: data.msg || "ORDER created successfully.", orderNumber: data.order_number };
+                    setStore({ cart: [] }); // Clear cart after successful order
+                    localStorage.removeItem("cart");
+                    return { success: true, message: data.msg || "Order created successfully.", orderNumber: data.order_number };
                 } catch (error) {
                     console.error("Error during API call:", error);
-                    return { success: false, message: "An error occurred while creating the ORDER." };
+                    return { success: false, message: "An error occurred while creating the order." };
                 }
             },
-            
+
             getProducts: async () => {
                 try {
                     const response = await fetch(process.env.BACKEND_URL + "/api/products");
                     if (!response.ok) throw new Error("Failed to fetch products");
-                    
+
                     const data = await response.json();
-                    
-                    // Check if the response contains a 'products' property which is an array
                     if (Array.isArray(data.products)) {
-                        setStore({ products: data.products }); // Store the products array
+                        setStore({ products: data.products });
                     } else {
                         console.error("Unexpected response format for products:", data);
-                        setStore({ products: [] }); // Fallback to empty array if the format is not correct
+                        setStore({ products: [] });
                     }
                 } catch (error) {
                     console.error("Error fetching products:", error);
                 }
             },
-           
+
             addToCart: (product) => {
                 const store = getStore();
-            
-                // Encuentra si el producto ya está en el carrito
                 const existingItem = store.cart.find(item => item.product_id === product.id);
                 if (existingItem) {
-                    // Si ya está, aumenta la cantidad
                     existingItem.quantity += 1;
                 } else {
-                    // Si no está, agrégalo con `product_id` y `quantity`
-                    const newItem = {
-                        product_id: product.id, // Usa `id` del producto como `product_id`
-                        quantity: 1, // Inicializa con cantidad 1
-                        name: product.name, // Puedes añadir otros campos opcionales si lo necesitas
-                        price: product.price
-                    };
-                    store.cart.push(newItem);
+                    store.cart.push({
+                        product_id: product.id,
+                        quantity: 1,
+                        name: product.name,
+                        price: product.price,
+                    });
                 }
-            
-                // Actualiza el store
                 const updatedCart = [...store.cart];
                 setStore({ cart: updatedCart });
-            
-                // Guarda el carrito en localStorage
                 localStorage.setItem("cart", JSON.stringify(updatedCart));
-            
                 console.log("Cart updated:", updatedCart);
             },
-            
+            // Función para actualizar el carrito
+            setCart: updatedCart => {
+                setStore({ cart: updatedCart });
+            },
 
             initializeCart: () => {
                 const savedCart = localStorage.getItem("cart");
                 if (savedCart) {
                     setStore({ cart: JSON.parse(savedCart) });
                 }
-            },
-              // Función para actualizar el carrito
-              setCart: updatedCart => {
-                setStore({ cart: updatedCart });
             },
 
             removeFromCart: (index) => {
@@ -233,6 +219,6 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
         },
     };
-   };
-   
-   export default getState;
+};
+
+export default getState;

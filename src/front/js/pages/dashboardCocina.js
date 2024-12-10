@@ -4,13 +4,14 @@ import { Context } from "../store/appContext";
 
 const DashboardCocina = () => {
   const { store, actions } = React.useContext(Context);
-  const { orders } = store; // Access orders from the store
+  const { orders } = store;
 
   useEffect(() => {
     actions.getOrders();
-  }, [actions]);
+  }, []);
 
-  console.log(store.orders);
+  const placeholderImage =
+    "https://res.cloudinary.com/dnmm7omko/image/upload/v1733842727/ubstteb7dmizj50zozse.webp";
 
   return (
     <div className="container mt-5">
@@ -26,21 +27,9 @@ const DashboardCocina = () => {
             Action
           </button>
           <ul className="dropdown-menu">
-            <li>
-              <a className="dropdown-item" href="#">
-                Action
-              </a>
-            </li>
-            <li>
-              <a className="dropdown-item" href="#">
-                Another action
-              </a>
-            </li>
-            <li>
-              <a className="dropdown-item" href="#">
-                Something else here
-              </a>
-            </li>
+            <li><button className="dropdown-item">Action</button></li>
+            <li><button className="dropdown-item">Another action</button></li>
+            <li><button className="dropdown-item">Something else here</button></li>
           </ul>
           <form className="d-flex justify-content-start" role="search">
             <input
@@ -49,21 +38,15 @@ const DashboardCocina = () => {
               placeholder="Search"
               aria-label="Search"
             />
-            <button className="btn btn-primary" type="submit">
-              Buscar
-            </button>
+            <button className="btn btn-primary" type="submit">Buscar</button>
           </form>
         </div>
         <div>
           <Link to="/add/menu">
-            <button className="btn btn-primary" role="button">
-              Añadir Menu
-            </button>
+            <button className="btn btn-primary">Añadir Menu</button>
           </Link>
           <Link to="/menu" className="ms-2">
-            <button type="submit" className="btn btn-primary">
-              Compra Menu
-            </button>
+            <button className="btn btn-primary">Compra Menu</button>
           </Link>
         </div>
       </div>
@@ -71,28 +54,20 @@ const DashboardCocina = () => {
         <table className="table table-secondary table-striped mt-3">
           <thead>
             <tr>
-              <th scope="col">
+              <th>
                 <div className="form-check">
-                  <input
-                    className="form-check-input"
-                    type="checkbox"
-                    id="flexCheckIndeterminate"
-                  />
-                  <label
-                    className="form-check-label"
-                    htmlFor="flexCheckIndeterminate"
-                  ></label>
+                  <input className="form-check-input" type="checkbox" />
                 </div>
               </th>
-              <th scope="col">Fecha</th>
-              <th scope="col">Tipo</th>
-              <th scope="col">Descripcion</th>
-              <th scope="col">Estado</th>
-              <th scope="col">Categoria</th>
-              <th scope="col">Stock</th>
-              <th scope="col">Imagen</th>
-              <th scope="col">Precio</th>
-              <th scope="col"></th>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Descripcion</th>
+              <th>Estado</th>
+              <th>Categoria</th>
+              <th>Stock</th>
+              <th>Imagen</th>
+              <th>Precio</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -103,25 +78,21 @@ const DashboardCocina = () => {
             ) : (
               orders.map((order, index) => (
                 <React.Fragment key={order.id || index}>
-                  {/* Order Details Row */}
                   <tr>
-                    <th scope="row">
+                    <th>
                       <div className="form-check">
                         <input
                           className="form-check-input"
                           type="checkbox"
                           id={`orderCheck${index}`}
                         />
-                        <label
-                          className="form-check-label"
-                          htmlFor={`orderCheck${index}`}
-                        ></label>
                       </div>
                     </th>
                     <td>{new Date(order.date).toLocaleDateString() || "N/A"}</td>
                     <td>{order.order_number || "N/A"}</td>
+                    <td>{order.description || "N/A"}</td>
                     <td>{order.status || "N/A"}</td>
-                    <td colSpan="3">{order.status || "N/A"}</td>
+                    <td colSpan="3">{order.category || "N/A"}</td>
                     <td className="d-flex justify-content-end">
                       <Link to="/add/menu" className="btn">
                         <i className="fa-solid fa-pen"></i>
@@ -135,43 +106,33 @@ const DashboardCocina = () => {
                         <i className="fa-solid fa-ellipsis"></i>
                       </button>
                       <ul className="dropdown-menu">
-                        <li>
-                          <a className="dropdown-item" href="#">
-                            Edit
-                          </a>
-                        </li>
-                        <li>
-                          <a className="dropdown-item" href="#">
-                            Delete
-                          </a>
-                        </li>
+                        <li><button className="dropdown-item">Edit</button></li>
+                        <li><button className="dropdown-item">Delete</button></li>
                       </ul>
                     </td>
                   </tr>
-
-                  {/* Products Rows (below the order) */}
-                  {order.products && order.products.length > 0 ? (
-                    order.products.map((orderProduct, productIndex) => (
+                  {order.products?.length > 0 ? (
+                    order.products.map((product, productIndex) => (
                       <tr key={productIndex}>
                         <td colSpan="2"></td>
-                        <td>{orderProduct.name || "N/A"}</td>
-                        <td>{orderProduct.description || "N/A"}</td>
-                        <td>{orderProduct.status || "N/A"}</td>
-                        <td>{orderProduct.category || "N/A"}</td>
-                        <td>{orderProduct.stock || 0}</td>
+                        <td>{product.name || "N/A"}</td>
+                        <td>{product.description || "N/A"}</td>
+                        <td>{product.status || "N/A"}</td>
+                        <td>{product.category || "N/A"}</td>
+                        <td>{product.stock || 0}</td>
                         <td>
                           <img
-                            src={orderProduct.image || "https://res.cloudinary.com/dnmm7omko/image/upload/v1733842727/ubstteb7dmizj50zozse.webp"}
-                            alt={orderProduct.name || "Product"}
+                            src={product.image || placeholderImage}
+                            alt={product.name || "Product"}
                             style={{ width: "50px" }}
                           />
                         </td>
-                        <td>{`$${orderProduct.price || 0}`}</td>
+                        <td>{`$${product.price || 0}`}</td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="10">No products in this order</td>
+                      <td colSpan="10">No products in this order.</td>
                     </tr>
                   )}
                 </React.Fragment>
