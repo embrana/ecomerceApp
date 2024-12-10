@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
 import "../../styles/cart.css";
@@ -22,16 +22,18 @@ const Cart = () => {
             item.product_id === productId ? { ...item, quantity: value } : item
         );
 
-        actions.setCart(updatedCart);
-        console.log(updatedCart)
+        actions.setCart(updatedCart); // Update cart in store
+        console.log("Cart updated with new quantity:", updatedCart);
     };
 
-    const handleRemove = (index) => {
-        const updatedCart = state.store.cart.filter((_, i) => i !== index);
-        setCart(updatedCart);
+    const handleRemove = (productId) => {
+        // Filter out the item to be removed
+        const updatedCart = store.cart.filter((item) => item.product_id !== productId);
+
+        actions.setCart(updatedCart); // Update cart in store
+        console.log("Item removed, updated cart:", updatedCart);
     };
 
-    // Lógica compartida para ambas versiones del carrito (checkout y checkout1)
     const renderCartItems = () => {
         if (store.cart.length === 0) {
             return <p className="text-muted text-center">Your cart is empty</p>;
@@ -43,7 +45,7 @@ const Cart = () => {
                 key={item.product_id}
                 style={{ fontSize: "0.9rem" }}
             >
-                {/* Imagen del producto */}
+                {/* Product Image */}
                 <div className="flex-shrink-0" style={{ width: "60px" }}>
                     <img
                         className="img-fluid"
@@ -57,13 +59,13 @@ const Cart = () => {
                     />
                 </div>
 
-                {/* Nombre y precio del producto */}
+                {/* Product Name and Price */}
                 <div className="flex-grow-1 ms-2">
                     <h6 className="mb-1 text-truncate">{item.name}</h6>
                     <p className="mb-0 text-muted">${item.price}</p>
                 </div>
 
-                {/* Selector de cantidad */}
+                {/* Quantity Selector */}
                 <div className="d-flex align-items-center">
                     <button
                         type="button"
@@ -95,7 +97,7 @@ const Cart = () => {
                     </button>
                 </div>
 
-                {/* Botón para eliminar */}
+                {/* Remove Button */}
                 <div className="ms-2">
                     <button
                         type="button"
@@ -104,13 +106,6 @@ const Cart = () => {
                     >
                         <i className="fa-solid fa-trash"></i>
                     </button>
-                    {/* <button
-                        type="button"
-                        className="btn btn-link btn-sm text-danger"
-                        onClick={() => actions.removeFromCart(index)}
-                      >
-                        <i className="fa-solid fa-trash"></i>
-                     </button> */}
                 </div>
             </div>
         ));
@@ -121,7 +116,7 @@ const Cart = () => {
             <button className="responsive-btn" onClick={toggleCheckout}>
                 Cart
             </button>
-            {/* Checkout para escritorio */}
+            {/* Desktop Checkout */}
             <div className="row border checkout">
                 <div className="col-12">
                     <div className="panel panel-info mt-2">
@@ -151,7 +146,7 @@ const Cart = () => {
                                 <div className="col-6 text-end">
                                     <Link to={"/checkout"}>
                                         <button type="button" className="btn btn-success">
-                                            Pagar
+                                            Checkout
                                         </button>
                                     </Link>
                                 </div>
@@ -161,7 +156,7 @@ const Cart = () => {
                 </div>
             </div>
 
-            {/* Checkout para móvil */}
+            {/* Mobile Checkout */}
             <div className="row border checkout1">
                 <div className="col-12">
                     <div className="panel panel-info mt-2">
@@ -191,7 +186,7 @@ const Cart = () => {
                                 <div className="col-6 text-end">
                                     <Link to={"/checkout"}>
                                         <button type="button" className="btn btn-success">
-                                            Pagar
+                                            Checkout
                                         </button>
                                     </Link>
                                 </div>
