@@ -1,5 +1,5 @@
 from flask import request, jsonify, Blueprint
-from api.models import db, User, Product, Order, OrderProduct
+from api.models import db, User, Product, Order, OrderProduct, Reserve
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from api.utils import APIException
 from datetime import datetime, timezone
@@ -240,3 +240,34 @@ def get_all_orders():
         print(f"Error in get_all_orders: {e}")
         # Return a 500 error for internal server issues
         return jsonify({"msg": "Internal server error"}), 500
+    
+
+@api.route('/reserve', methods=['POST'])
+@jwt_required()
+def create_reserve():
+    """
+    Create a new reserve for the logged-in user.
+    """
+    current_user_id = get_jwt_identity()  # This is now the user ID as a string
+    user = User.query.get(current_user_id)  # Fetch the user object
+
+    if not user:
+        return jsonify({"msg": "User not found"}), 404
+    
+    body = request.get_json()
+    date = body.get("date")
+
+    try:
+        # Create the reserve
+        reserve = Reserve(
+            user_id=user.id,
+            date=date
+        )
+        db.session.add(reserve)
+         # Commit the transaction
+        db.session.commit()
+        return jsonify({"msg": "Reserve created successfully"}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": f"Failed to create reserve: {str(e)}"}), 500
