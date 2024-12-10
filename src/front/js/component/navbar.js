@@ -8,6 +8,7 @@ export const Navbar = () => {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
 
     const isLoggedIn = store.token || sessionStorage.getItem("auth_token");
+    
 
     // Detectar si la pantalla es pequeña
     useEffect(() => {

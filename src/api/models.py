@@ -15,6 +15,9 @@ class User(db.Model):
     # Relationship to orders
     orders = db.relationship("Order", backref="user", lazy=True)
 
+     # Relationship to reserve
+    reserve = db.relationship("Reserve", backref="user", lazy=True)
+
     def __repr__(self):
         return f'<User {self.email}>'
 
@@ -100,4 +103,19 @@ class Order(db.Model):
             "date": self.date.isoformat(),
             "status": self.status,
             "order_number": self.order_number,
+        }
+    
+class Reserve(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Reserve {self.id} - User {self.user_id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "date": self.date.isoformat(),
         }
