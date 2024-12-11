@@ -56,7 +56,7 @@ def login():
         access_token = create_access_token(identity=str(user.id))
 
         # Respond with the token and redirect URL
-        return jsonify({"token": access_token, "redirect_url": redirect_url}), 200
+        return jsonify({"token": access_token, "redirect_url": redirect_url, "user_type" : user.is_cocina}), 200
 
     # Handle invalid credentials
     return jsonify({"msg": "Invalid email or password"}), 401

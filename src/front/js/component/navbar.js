@@ -1,13 +1,16 @@
 import React, { useContext, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { Fragment } from "react";
+
 
 export const Navbar = () => {
     const { store, actions } = useContext(Context);
     const [isSmallScreen, setIsSmallScreen] = useState(false);
 
     const isLoggedIn = store.token || sessionStorage.getItem("auth_token");
+
+    const navigate = useNavigate();
     
 
     // Detectar si la pantalla es pequeña
@@ -21,6 +24,17 @@ export const Navbar = () => {
 
         return () => window.removeEventListener("resize", handleResize);
     }, []);
+
+    let location = useLocation();
+    console.log (location.pathname);
+    console.log(store.user_type);
+    
+        useEffect(() => {
+            if (store.user_type === "false" && location.pathname == "/dashboard/cocina" ){
+                navigate("/menu");
+            }
+        }, [store.user_type]);
+    
 
 return (
         <nav className="navbar navbar-light bg-primary px-0">
