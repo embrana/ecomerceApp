@@ -89,6 +89,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/orders");
                     if (data && Array.isArray(data.orders)) {
                         setStore({ orders: data.orders });
+                        console.log("Fetched products:", data);
                     } else {
                         console.error("Unexpected response format:", data);
                         setStore({ orders: [] });
