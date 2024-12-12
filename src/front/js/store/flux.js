@@ -2,7 +2,7 @@ const getState = ({ getStore, getActions, setStore }) => {
     return {
         store: {
             token: sessionStorage.getItem("auth_token") || null,
-            user_type:sessionStorage.getItem("userType") || null,
+            user_type:sessionStorage.getItem("user_type") || null,
             error: null,
             products: [],
             cart: [],
@@ -56,10 +56,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 
                     const data = await response.json();
                     sessionStorage.setItem("auth_token", data.token);
-                    sessionStorage.setItem("userType", data.user_type);
+                    sessionStorage.setItem("user_type", data.user_type);
 
                     setStore({ token: data.token, error: null });
-                    setStore({ user_type: data.userType, error: null });
+                    setStore({ user_type: data.user_type, error: null });
 
                     return { success: true, redirectUrl: data.redirect_url };
                 } catch (error) {
@@ -71,8 +71,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             logout: () => {
                 sessionStorage.removeItem("auth_token");
+                sessionStorage.removeItem("user_type");
                 setStore({
                     token: null,
+                    user_type: null,
                     cart: [],
                     orders: [],
                     products: [],
