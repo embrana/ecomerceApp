@@ -4,8 +4,9 @@ import { Context } from "../store/appContext";
 
 const DashboardCocina = () => {
   const { store, actions } = React.useContext(Context);
-  const { orders, products } = store; 
+  const { orders, products } = store;
   const [currentView, setCurrentView] = useState("orders"); // 'orders' or 'products'
+  const [searchQuery, setSearchQuery] = useState(""); // State for the search query
 
   useEffect(() => {
     actions.getOrders();
@@ -18,6 +19,10 @@ const DashboardCocina = () => {
   const calculateOrderTotal = (products) => {
     return products?.reduce((sum, product) => sum + (product.price || 0) * (product.quantity || 1), 0).toFixed(2);
   };
+
+  const filteredOrders = orders.filter((order) =>
+    order.order_number?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="container mt-5">
@@ -48,12 +53,14 @@ const DashboardCocina = () => {
               </li>
             </ul>
           </div>
-          <form className="d-flex justify-content-start" role="search">
+          <form className="d-flex justify-content-start" role="search" onSubmit={(e) => e.preventDefault()}>
             <input
               className="form-control me-2"
               type="search"
-              placeholder="Search"
+              placeholder="Search by Order Number"
               aria-label="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
             <button className="btn btn-primary" type="submit">Buscar</button>
           </form>
@@ -83,12 +90,12 @@ const DashboardCocina = () => {
               </tr>
             </thead>
             <tbody>
-              {orders.length === 0 ? (
+              {filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan="10">No orders found.</td>
+                  <td colSpan="5">No orders found.</td>
                 </tr>
               ) : (
-                orders.map((order, index) => (
+                filteredOrders.map((order, index) => (
                   <React.Fragment key={order.id || index}>
                     <tr>
                       <td>{new Date(order.date).toLocaleDateString() || "N/A"}</td>
@@ -114,7 +121,7 @@ const DashboardCocina = () => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="10">No products in this order.</td>
+                        <td colSpan="5">No products in this order.</td>
                       </tr>
                     )}
                   </React.Fragment>
@@ -124,40 +131,9 @@ const DashboardCocina = () => {
           </table>
         </div>
       ) : (
+        // Render products table
         <div className="table-responsive mt-3">
-          <h2>Productos en el Menu</h2>
-          <table className="table table-secondary table-striped">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Stock</th>
-                <th>Precio</th>
-                <th>Imagen</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.length === 0 ? (
-                <tr>
-                  <td colSpan="3">No products found.</td>
-                </tr>
-              ) : (
-                products.map((product, index) => (
-                  <tr key={index}>
-                    <td>{product.name || "N/A"}</td>
-                    <td>{product.stock || "N/A"}</td>
-                    <td>{`$${product.price || 0}`}</td>
-                    <td>
-                      <img
-                        src={product.image || placeholderImage}
-                        alt={product.name || "Item"}
-                        style={{ width: "50px" }}
-                      />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+          {/* Products content */}
         </div>
       )}
     </div>
