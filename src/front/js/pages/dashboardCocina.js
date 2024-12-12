@@ -4,12 +4,12 @@ import { Context } from "../store/appContext";
 
 const DashboardCocina = () => {
   const { store, actions } = React.useContext(Context);
-  const { orders } = store; // Orders contain the product data
-  const [currentView, setCurrentView] = useState("orders"); // 'orders' or 'products'
-  const [searchQuery, setSearchQuery] = useState(""); // State for the search query
+  const { orders } = store; 
+  const [currentView, setCurrentView] = useState("orders");
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    actions.getOrders(); // Fetch orders data
+    actions.getOrders(); 
   }, []);
 
   const placeholderImage =
@@ -29,12 +29,10 @@ const DashboardCocina = () => {
   // Extract unique products from orders
   const uniqueProducts = React.useMemo(() => {
     const allProducts = orders.flatMap((order) => order.products || []);
-    
-    // Use a Map to store products by their unique `id` or name
     const productMap = new Map();
   
     allProducts.forEach((product) => {
-      const uniqueKey = product.id || product.name; // Fallback to name if `id` is missing
+      const uniqueKey = product.id || product.name; 
       if (!productMap.has(uniqueKey)) {
         productMap.set(uniqueKey, product);
       }
@@ -91,7 +89,7 @@ const DashboardCocina = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <button className="btn btn-primary" type="submit">
+            <button className="btn btn-primary" onClick={() => setCurrentView("orders")} type="submit">
               Buscar
             </button>
           </form>
