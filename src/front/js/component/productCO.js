@@ -23,6 +23,7 @@ const ProductCO = () => {
     };
 
     return (
+        
         <div className="container my-4" style={{ maxWidth: "400px", margin: "0 auto" }}>
             <div className="row border">
                 <div className="col-12">
@@ -96,14 +97,14 @@ const ProductCO = () => {
                                 <div className="col-6 text-end">
                                     <button
                                         type="button"
-                                        className="btn btn-success"
+                                        className="btn btn-success mb-2"
                                         onClick={() => actions.setOrder()}
                                     >
                                         Pagar en Efectivo
                                     </button>
                                     <button
                                         type="button"
-                                        className="btn btn-success"
+                                        className="btn btn-success mb-2"
                                         onClick={() => actions.setOrder()}
                                     >
                                         Mercado Pago

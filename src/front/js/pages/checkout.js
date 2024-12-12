@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import ProductCO from "../component/productCO";
 import "../../styles/home.css";
+import Receipt from "../component/invoice";
 
 export const CheckOut = () => {
     const { store, actions } = useContext(Context);
@@ -20,6 +21,7 @@ export const CheckOut = () => {
     return (
                 <div className="container mx-5">
                     <ProductCO />
+                    <Receipt />
                 </div>
     );
 };

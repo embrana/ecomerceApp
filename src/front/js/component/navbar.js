@@ -85,7 +85,7 @@ return (
                                         </li>
                                         <li>
                                             <Link to="/dashboard/cocina" className="text-decoration-none">
-                                                <button style={{ display: store.user_type === "false" ? "none" : "block" }} className="btn btn-light w-100">Cocina Pedidos</button>
+                                                <button style={{ display: store.user_type == "false" ? "none" : "block" }} className="btn btn-light w-100">Cocina Pedidos</button>
                                             </Link>
                                         </li>
                                         <li className="dropdown-item">

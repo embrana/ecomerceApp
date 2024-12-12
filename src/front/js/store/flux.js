@@ -7,6 +7,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             products: [],
             cart: [],
             orders: [],
+            order_data: [],
             reserve: [],
         },
         actions: {
@@ -99,6 +100,22 @@ const getState = ({ getStore, getActions, setStore }) => {
                     setStore({ orders: [] });
                 }
             },
+             // Fetch orders
+            getOrders: async () => {
+                try {
+                    const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/orders");
+                    if (data && Array.isArray(data.orders)) {
+                        setStore({ orders: data.orders });
+                        console.log("Fetched products:", data);
+                    } else {
+                        console.error("Unexpected response format:", data);
+                        setStore({ orders: [] });
+                    }
+                } catch (error) {
+                    console.error("Error fetching orders:", error);
+                    setStore({ orders: [] });
+                }
+            },
 
             // Publish a new product
             publishProduct: async (formData) => {
@@ -126,16 +143,16 @@ const getState = ({ getStore, getActions, setStore }) => {
             // Place an order
             setOrder: async () => {
                 const store = getStore();
-                const consolidatedCart = getActions().consolidateCart(store.cart);
-
-                console.log("Consolidated cart data:", consolidatedCart);
+                const actions = getActions();
+                const consolidatedCart = actions.consolidateCart(store.cart);
+            
                 try {
                     const token = store.token;
                     if (!token) {
                         console.error("Token not found. Please log in.");
                         return { success: false, message: "User token not available." };
                     }
-
+            
                     const response = await fetch(`${process.env.BACKEND_URL}/api/orders`, {
                         method: "POST",
                         headers: {
@@ -144,18 +161,22 @@ const getState = ({ getStore, getActions, setStore }) => {
                         },
                         body: JSON.stringify({ cart: consolidatedCart }),
                     });
-
+            
                     if (!response.ok) {
                         const errorData = await response.json();
                         console.error("API Error:", errorData);
                         return { success: false, message: errorData.msg || "Failed to create order." };
                     }
-
+            
                     const data = await response.json();
                     console.log("Order created successfully:", data);
-                    setStore({ cart: [] }); // Clear cart after successful order
+            
+                    // Store the order details in the store
+                    setStore({ order_data: data.order, cart: [] });
                     localStorage.removeItem("cart");
-                    return { success: true, message: data.msg || "Order created successfully.", orderNumber: data.order_number };
+                    console.log(data.order);
+            
+                    return { success: true, message: "Order created successfully.", order: data.order };
                 } catch (error) {
                     console.error("Error during API call:", error);
                     return { success: false, message: "An error occurred while creating the order." };
