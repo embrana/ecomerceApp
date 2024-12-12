@@ -161,6 +161,13 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false, message: "An error occurred while creating the order." };
                 }
             },
+            updateOrderInStore: (updatedOrder) => {
+                const store = getStore();
+                const updatedOrders = store.orders.map((order) =>
+                  order.id === updatedOrder.id ? updatedOrder : order
+                );
+                setStore({ orders: updatedOrders });
+              },
 
             getProducts: async () => {
                 try {

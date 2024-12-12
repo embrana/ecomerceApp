@@ -211,10 +211,31 @@ def create_order():
         db.session.rollback()
         return jsonify({"msg": f"Failed to create order: {str(e)}"}), 500
 
+@api.route('/orders/<int:order_id>', methods=['PATCH'])
+def update_order_status(order_id):
+    data = request.get_json()
+
+    # Validate the incoming data
+    if 'status' not in data:
+        return jsonify({"error": "Missing 'status' field"}), 400
+
+    try:
+        # Fetch the order
+        order = Order.query.get(order_id)
+        if not order:
+            return jsonify({"error": "Order not found"}), 404
+
+        # Update the status
+        order.status = data['status']
+        db.session.commit()
+
+        return jsonify(order.serialize()), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 
-
-    
 @api.route('/orders', methods=['GET'])
 def get_all_orders():
     """

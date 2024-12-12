@@ -5,13 +5,14 @@ import { Context } from "../store/appContext";
 const DashboardCocina = () => {
   const { store, actions } = React.useContext(Context);
   const { orders, products } = store;
-  const [currentView, setCurrentView] = useState("orders"); // 'orders' or 'products'
-  const [searchQuery, setSearchQuery] = useState(""); // State for the search query
+  const [currentView, setCurrentView] = useState("orders"); 
+  const [searchQuery, setSearchQuery] = useState(""); // 
+  const [message, setMessage] = useState(null); // State for messages
 
   // Fetch products and orders on mount
   useEffect(() => {
     actions.getOrders();
-    actions.getProducts();  // Fetch products here
+    actions.getProducts();  
   }, []);
 
   const placeholderImage =
@@ -30,6 +31,27 @@ const DashboardCocina = () => {
   const filteredProducts = products.filter((product) =>
     product.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      const response = await fetch(`${process.env.BACKEND_URL}/api/orders/${orderId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+  
+      if (!response.ok) throw new Error("Failed to update status");
+  
+      const updatedOrder = await response.json();
+      actions.updateOrderInStore(updatedOrder); // Update the local store (you may need to implement this)
+      setMessage({ type: "success", text: "Order status updated successfully." });
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      setMessage({ type: "error", text: "Failed to update order status." });
+    }
+  };
 
   return (
     <div className="container mt-5">
@@ -82,6 +104,13 @@ const DashboardCocina = () => {
         </div>
       </div>
 
+      {/* Display message */}
+      {message && (
+        <div className={`alert alert-${message.type === "success" ? "success" : "danger"} mt-3`} role="alert">
+          {message.text}
+        </div>
+      )}
+
       {/* Conditionally Render Content */}
       {currentView === "orders" ? (
         <div className="table-responsive mt-3">
@@ -107,7 +136,35 @@ const DashboardCocina = () => {
                     <tr>
                       <td>{new Date(order.date).toLocaleDateString() || "N/A"}</td>
                       <td>{order.order_number || "N/A"}</td>
-                      <td>{order.status || "N/A"}</td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-sm btn-secondary dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            {order.status || "N/A"}
+                          </button>
+                          <ul className="dropdown-menu">
+                            {[
+                              "Pendiente",
+                              "En produccion",
+                              "Completada",
+                              "Cancelada",
+                            ].map((status) => (
+                              <li key={status}>
+                                <button
+                                  className="dropdown-item"
+                                  onClick={() => handleStatusChange(order.id, status)}
+                                >
+                                  {status}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </td>
                       <td>${calculateOrderTotal(order.products)}</td>
                     </tr>
                     {order.products?.length > 0 ? (
@@ -158,7 +215,7 @@ const DashboardCocina = () => {
                 filteredProducts.map((product, index) => (
                   <tr key={index}>
                     <td>{product.name || "N/A"}</td>
-                    <td>{product.stock !== undefined ? product.stock : "N/A"}</td> {/* Updated here */}
+                    <td>{product.stock !== undefined ? product.stock : "N/A"}</td>
                     <td>{`$${product.price || 0}`}</td>
                     <td>
                       <img
