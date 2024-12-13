@@ -69,9 +69,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     });
             
                     console.log("Session storage updated and state set.");
-            
-                    // Wait until the session storage operations complete
-                    await new Promise((resolve) => setTimeout(resolve, 0));
+                   
             
                     // Return success and the URL to redirect to
                     return { success: true, redirectUrl: data.redirect_url };

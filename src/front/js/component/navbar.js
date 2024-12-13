@@ -84,9 +84,9 @@ return (
                                             </Link>
                                         </li>
                                         <li>
-                                            <Link to="/dashboard/cocina" className="text-decoration-none">
-                                                <button style={{ display: store.user_type === "true" ? "block" : "none" }} className="btn btn-light w-100">Cocina Pedidos</button>
-                                            </Link>
+                                            {store.user_type && <Link to="/dashboard/cocina" className="text-decoration-none">
+                                                <button className="btn btn-light w-100">Cocina Pedidos</button>
+                                            </Link>}
                                         </li>
                                         <li className="dropdown-item">
                                             <button
@@ -123,9 +123,9 @@ return (
                                 <Link to="/reserve">
                                     <button className="btn btn-light me-2">Comedor</button>
                                 </Link>
-                                <Link to="/dashboard/cocina" className="text-decoration-none">
-                                    <button style={{ display: store.user_type === "true" ? "block" : "none" }} className="btn btn-light me-2">Cocina Pedidos</button>
-                                </Link>            
+                                {store.user_type && <Link to="/dashboard/cocina" className="text-decoration-none">
+                                                <button className="btn btn-light w-100">Cocina Pedidos</button>
+                                            </Link>}          
                                 <button
                                     className="btn btn-danger"
                                     onClick={() => actions.logout()}
