@@ -8,31 +8,30 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [successMessage, setSuccessMessage] = useState(""); // State for success message
+    const [loading, setLoading] = useState(false); // State for loading
     const navigate = useNavigate(); // Initialize useNavigate
 
     const handleSubmit = async (e) => {
         e.preventDefault();
     
-        // Clear any previous errors and success messages before attempting a new login
+        // Clear any previous errors and success messages
         setError("");
         setSuccessMessage("");
+        setLoading(true);
     
-        // Try logging in
-        const { success, redirectUrl } = await actions.login(email, password);
+        try {
+            const { success, redirectUrl } = await actions.login(email, password);
     
-        // If login failed, show error from store
-        if (!success) {
-            setError(store.error || "An unknown error occurred.");
-        } else {
-            // Optionally store token in localStorage for persistence
-            if (store.token) {
-                localStorage.setItem("token", store.token);
+            if (!success) {
+                setError(store.error || "An unknown error occurred.");
+            } else {
+                setSuccessMessage("Login successful! Redirecting...");
+                setTimeout(() => navigate(redirectUrl || "/menu"), 2000); // Redirect after 2 seconds
             }
-            // Show success message
-            setSuccessMessage("Login successful! Redirecting...");
-    
-            // Redirect to the route provided by the backend
-            setTimeout(() => navigate(redirectUrl || "/menu"), 2000); // Redirect after 2 seconds
+        } catch (err) {
+            setError("An unexpected error occurred. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -40,10 +39,22 @@ const Login = () => {
         <div className="container d-flex justify-content-center align-items-center vh-100">
             <div className="card p-4 shadow" style={{ maxWidth: "400px", width: "100%" }}>
                 <h3 className="text-center mb-4">Login</h3>
-                {/* Show error message if any */}
+                
+                {/* Show error message */}
                 {error && <div className="alert alert-danger">{error}</div>}
-                {/* Show success message if any */}
+                
+                {/* Show success message */}
                 {successMessage && <div className="alert alert-success">{successMessage}</div>}
+                
+                {/* Show loading spinner */}
+                {loading && (
+                    <div className="text-center mb-3">
+                        <div className="spinner-border text-primary" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                )}
+                
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
                         <label htmlFor="email" className="form-label">Email</label>
@@ -55,6 +66,7 @@ const Login = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
+                            disabled={loading} // Disable input during loading
                         />
                     </div>
                     <div className="mb-3">
@@ -67,9 +79,16 @@ const Login = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
+                            disabled={loading} // Disable input during loading
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary w-100">Login</button>
+                    <button 
+                        type="submit" 
+                        className="btn btn-primary w-100" 
+                        disabled={loading} // Disable button during loading
+                    >
+                        {loading ? "Logging in..." : "Login"}
+                    </button>
                 </form>
             </div>
         </div>

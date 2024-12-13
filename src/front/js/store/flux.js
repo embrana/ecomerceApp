@@ -48,20 +48,32 @@ const getState = ({ getStore, getActions, setStore }) => {
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ email, password }),
                     });
-
+            
                     if (!response.ok) {
                         const errorData = await response.json();
                         setStore({ error: errorData.msg });
                         return { success: false };
                     }
-
+            
                     const data = await response.json();
+            
+                    // Store the token and user type in sessionStorage
                     sessionStorage.setItem("auth_token", data.token);
                     sessionStorage.setItem("user_type", data.user_type);
-
-                    setStore({ token: data.token, error: null });
-                    setStore({ user_type: data.user_type, error: null });
-
+            
+                    // Update the store with token and user_type
+                    setStore({
+                        token: data.token,
+                        user_type: data.user_type,
+                        error: null, // Clear any existing error
+                    });
+            
+                    console.log("Session storage updated and state set.");
+            
+                    // Wait until the session storage operations complete
+                    await new Promise((resolve) => setTimeout(resolve, 0));
+            
+                    // Return success and the URL to redirect to
                     return { success: true, redirectUrl: data.redirect_url };
                 } catch (error) {
                     console.error("Login error:", error);
@@ -69,6 +81,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false };
                 }
             },
+            
 
             logout: () => {
                 sessionStorage.removeItem("auth_token");
@@ -181,7 +194,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false, message: "An error occurred while creating the order." };
                 }
             },
-            
             updateOrderInStore: (updatedOrder) => {
                 const store = getStore();
                 const updatedOrders = store.orders.map((order) =>
