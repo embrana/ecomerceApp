@@ -84,10 +84,7 @@ const Cart = () => {
 
     return (
         <div className="container my-4">
-            <button className="btn btn-primary w-100 mb-3" onClick={toggleCheckout}>
-                View Cart
-            </button>
-
+            
             {/* Cart Section */}
             <div className="card shadow-sm rounded border-0">
                 <div className="card-header bg-secondary text-white text-center">

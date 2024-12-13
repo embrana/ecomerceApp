@@ -138,7 +138,7 @@ const AddMenu = () => {
           <div style={{ width: "50%" }}>
             <textarea
               className="form-control mb-2"
-              placeholder="Descripcion detallada del plato"
+              placeholder="Dia y Descripcion del plato"
               style={{ height: "200px" }}
               value={menu.description}
               onChange={(e) => setMenu({ ...menu, description: e.target.value })}

@@ -67,14 +67,7 @@ export const Menu = () => {
 
                 {/* Sección del Carrito */}
                 <div className="col-lg-4">
-                    <div className="card shadow-sm">
-                        <div className="card-header bg-secondary text-white text-center">
-                            <h4>Your Cart</h4>
-                        </div>
-                        <div className="card-body">
-                            <Cart />
-                        </div>
-                    </div>
+                    <Cart />
                 </div>
             </div>
         </div>
