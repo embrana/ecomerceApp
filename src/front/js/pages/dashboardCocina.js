@@ -201,13 +201,13 @@ const DashboardCocina = () => {
           </div>
         </div>
       ) : (
-        <div className="card shadow-sm mb-4 bg-secondary"> {/* Background color for Products */}
+        <div className="card mb-4"> 
           <div className="card-header text-center bg-primary text-white">
             <h5>Productos en el Menu</h5>
           </div>
           <div className="card-body">
             <div className="table-responsive mt-3">
-              <table className="table table-striped table-bordered">
+              <table className="table table-bordered">
                 <thead className="table-dark">
                   <tr>
                     <th>Nombre</th>
