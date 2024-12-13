@@ -10,6 +10,6 @@ const Reserve = () => {
             </div>
         </div>
     )
-}
+};
 
 export default Reserve
