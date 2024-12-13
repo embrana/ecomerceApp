@@ -140,10 +140,10 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            // Place an order
             setOrder: async () => {
                 const store = getStore();
                 const actions = getActions();
+            
                 const consolidatedCart = actions.consolidateCart(store.cart);
             
                 try {
@@ -171,17 +171,17 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const data = await response.json();
                     console.log("Order created successfully:", data);
             
-                    // Store the order details in the store
-                    setStore({ order_data: data.order, cart: [] });
+                    // Save the detailed order data in the store
+                    setStore({ order_data: data, cart: [] });
                     localStorage.removeItem("cart");
-                    console.log(data.order);
             
-                    return { success: true, message: "Order created successfully.", order: data.order };
+                    return { success: true, message: "Order created successfully.", order: data };
                 } catch (error) {
                     console.error("Error during API call:", error);
                     return { success: false, message: "An error occurred while creating the order." };
                 }
             },
+            
             updateOrderInStore: (updatedOrder) => {
                 const store = getStore();
                 const updatedOrders = store.orders.map((order) =>

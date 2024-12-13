@@ -152,7 +152,7 @@ def get_products():
 @jwt_required()
 def create_order():
     """
-    Create a new order for the logged-in user.
+    Create a new order for the logged-in user and return order details.
     """
     current_user_id = get_jwt_identity()  # This is now the user ID as a string
     user = User.query.get(current_user_id)  # Fetch the user object
@@ -181,6 +181,10 @@ def create_order():
         )
         db.session.add(order)
 
+        # Prepare order details
+        items = []
+        total_amount = 0.0
+
         # Add products to the order
         for item in cart:
             product_id = item.get("product_id")
@@ -196,6 +200,20 @@ def create_order():
 
             # Deduct stock
             product.stock -= quantity
+
+            # Calculate subtotal
+            subtotal = product.price * quantity
+            total_amount += subtotal
+
+            # Add product details to the response
+            items.append({
+                "name": product.name,
+                "price": product.price,
+                "quantity": quantity,
+                "subtotal": subtotal
+            })
+
+            # Create order-product relationship
             order_product = OrderProduct(
                 order_id=order.id,
                 product_id=product.id,
@@ -205,11 +223,19 @@ def create_order():
 
         # Commit the transaction
         db.session.commit()
-        return jsonify({"msg": "Order created successfully", "order_number": order_number}), 201
+
+        return jsonify({
+            "msg": "Order created successfully",
+            "order_number": order_number,
+            "date": datetime.now().isoformat(),
+            "items": items,
+            "total": total_amount
+        }), 201
 
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": f"Failed to create order: {str(e)}"}), 500
+
 
 @api.route('/orders/<int:order_id>', methods=['PATCH'])
 def update_order_status(order_id):
