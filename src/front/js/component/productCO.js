@@ -10,16 +10,14 @@ const ProductCO = ({ onPaymentSelect }) => {
     };
 
     return (
-        <div className="container my-4" style={{ maxWidth: "400px", margin: "0 auto" }}>
-            <div className="row border">
-                <div className="col-12">
-                    <div className="panel panel-info mt-2">
-                        <div className="panel-heading">
-                            <div className="panel-title text-center">
-                                <p className="fs-5 fw-bold">
-                                    <i className="fa-solid fa-cart-shopping"></i> Shopping Cart
-                                </p>
-                            </div>
+        <div className="container my-4">
+            <div className="row justify-content-center">
+                <div className="col-12 col-sm-10 col-md-8 col-lg-6"> {/* Center the cart */}
+                    <div className="panel panel-info">
+                        <div className="panel-heading text-center mt-2">
+                            <p className="fs-5 fw-bold">
+                                <i className="fa-solid fa-cart-shopping"></i> Shopping Cart
+                            </p>
                         </div>
 
                         <div className="panel-body mt-2">
@@ -30,6 +28,7 @@ const ProductCO = ({ onPaymentSelect }) => {
                                         key={index}
                                         style={{ fontSize: "0.9rem" }}
                                     >
+                                        {/* Product Image */}
                                         <div className="flex-shrink-0" style={{ width: "60px" }}>
                                             <img
                                                 className="img-fluid"
@@ -38,10 +37,14 @@ const ProductCO = ({ onPaymentSelect }) => {
                                                 style={{ width: "60px", height: "40px", objectFit: "cover" }}
                                             />
                                         </div>
+
+                                        {/* Product Name and Price */}
                                         <div className="flex-grow-1 ms-2">
                                             <h6 className="mb-1 text-truncate">{item.name}</h6>
                                             <p className="mb-0 text-muted">${item.price}</p>
                                         </div>
+
+                                        {/* Quantity Input */}
                                         <div className="d-flex align-items-center">
                                             <input
                                                 type="number"
@@ -50,6 +53,8 @@ const ProductCO = ({ onPaymentSelect }) => {
                                                 readOnly
                                             />
                                         </div>
+
+                                        {/* Remove Button */}
                                         <button
                                             type="button"
                                             className="btn btn-link btn-sm text-danger"
@@ -64,6 +69,7 @@ const ProductCO = ({ onPaymentSelect }) => {
                             )}
                         </div>
 
+                        {/* Cart Footer */}
                         <div className="panel-footer mt-3">
                             <div className="row align-items-center">
                                 <div className="col-6 text-start">
@@ -71,14 +77,15 @@ const ProductCO = ({ onPaymentSelect }) => {
                                         Total: <strong>${calculateTotal()}</strong>
                                     </h5>
                                 </div>
+
                                 <div className="col-6 text-end">
-                                    {/* Trigger payment selection */}
+                                    {/* Payment Buttons */}
                                     <button
                                         type="button"
                                         className="btn btn-success mb-2"
                                         onClick={() => {
-                                            actions.setOrder(); // Set the order
-                                            onPaymentSelect(); // Notify parent
+                                            actions.setOrder();
+                                            onPaymentSelect();
                                         }}
                                     >
                                         Pagar en Efectivo
@@ -87,8 +94,8 @@ const ProductCO = ({ onPaymentSelect }) => {
                                         type="button"
                                         className="btn btn-success mb-2"
                                         onClick={() => {
-                                            actions.setOrder(); // Set the order
-                                            onPaymentSelect(); // Notify parent
+                                            actions.setOrder();
+                                            onPaymentSelect();
                                         }}
                                     >
                                         Mercado Pago

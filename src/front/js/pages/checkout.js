@@ -13,7 +13,7 @@ export const CheckOut = () => {
     }, []);
 
     return (
-        <div className="container mx-5">
+        <div className="container">
             {/* Conditionally render ProductCO or Receipt */}
             {!paymentSelected && (
                 <ProductCO onPaymentSelect={() => setPaymentSelected(true)} />
