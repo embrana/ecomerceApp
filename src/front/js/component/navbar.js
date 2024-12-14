@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Context } from "../store/appContext";
-import { Fragment } from "react";
+
 
 
 export const Navbar = () => {
@@ -37,7 +37,7 @@ export const Navbar = () => {
     
 
 return (
-        <nav className="navbar navbar-light bg-primary px-0">
+        <nav className="navbar navbar-light px-0" style={{ backgroundColor: '#4364dd'}}>
             <div className="container-fluid mx-0">
                 {/* Logo */}
                 <Link to="/">
