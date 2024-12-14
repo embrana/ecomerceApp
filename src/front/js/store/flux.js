@@ -137,6 +137,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                             "Authorization": `Bearer ${getStore().token}`,
                         },
                         body: formData,
+                      
                     });
 
                     if (!response.ok) {

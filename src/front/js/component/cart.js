@@ -85,7 +85,7 @@ const Cart = () => {
                 onClick={toggleCartVisibility}
                 aria-label="Toggle Cart"
             >
-                Carrito
+                <i className="fa-solid fa-cart-shopping"></i>
             </button>
 
             {/* Cart Section */}
