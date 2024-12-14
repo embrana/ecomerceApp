@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 const ReservationCart = ({ reservas }) => {
   return (
     <div>
-      <h3>Reservation Cart</h3>
+      <h3>Reserva Comedor</h3>
       <ul>
         {reservas.map((reserva) => (
           <li key={reserva.id}>
@@ -104,13 +104,13 @@ function Dining() {
 
     let mensaje = "";
     if (mostrarError) {
-      mensaje = "Please select both date and time to add a reservation.";
+      mensaje = "Seleccione fecha y horario";
     } else if (alertaConcurrencia === "alta") {
-      mensaje = "High concurrency at this moment";
+      mensaje = "Alta concurrencia";
     } else if (alertaConcurrencia === "media") {
-      mensaje = "Medium concurrency at this moment";
+      mensaje = "Media concurrencia";
     } else {
-      mensaje = "Low concurrency at this moment";
+      mensaje = "Baja concurrencia";
     }
 
     return (
@@ -178,7 +178,7 @@ function Dining() {
               onChange={(e) => setHora(e.target.value)}
               className="form-control"
             >
-              <option value="">Select a time</option>
+              <option value="">Horario</option>
               {horariosDisponibles.map((horario) => (
                 <option key={horario} value={horario}>
                   {horario}
@@ -196,7 +196,7 @@ function Dining() {
             whiteSpace: "nowrap",  // Evita que el texto se divida en varias líneas
           }}
         >
-          Add Reservation
+          Reservar
         </button>
 
       </form>
@@ -229,12 +229,6 @@ function Dining() {
           onClick={cancelarReservas}
         >
           Cancel
-        </button>
-        <button
-          className="btn btn-primary me-md-2 w-100 w-md-auto h-100"
-          onClick={agregarAlCarrito}
-        >
-          Reserve
         </button>
       </div>
     </div>
