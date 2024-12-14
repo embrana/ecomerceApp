@@ -28,16 +28,7 @@ const ProductCO = ({ onPaymentSelect }) => {
                                         key={index}
                                         style={{ fontSize: "0.9rem" }}
                                     >
-                                        {/* Product Image */}
-                                        <div className="flex-shrink-0" style={{ width: "60px" }}>
-                                            <img
-                                                className="img-fluid"
-                                                src={item.image || "https://via.placeholder.com/150x100"}
-                                                alt="Product"
-                                                style={{ width: "60px", height: "40px", objectFit: "cover" }}
-                                            />
-                                        </div>
-
+                                        
                                         {/* Product Name and Price */}
                                         <div className="flex-grow-1 ms-2">
                                             <h6 className="mb-1 text-truncate">{item.name}</h6>
@@ -51,6 +42,7 @@ const ProductCO = ({ onPaymentSelect }) => {
                                                 className="form-control form-control-sm text-center mx-1"
                                                 value={item.quantity || 1}
                                                 readOnly
+                                                style={{"maxWidth": "40px"}}
                                             />
                                         </div>
 
@@ -78,11 +70,11 @@ const ProductCO = ({ onPaymentSelect }) => {
                                     </h5>
                                 </div>
 
-                                <div className="col-6 text-end">
+                                <div className="col-6 text-end d-flex ">
                                     {/* Payment Buttons */}
                                     <button
                                         type="button"
-                                        className="btn btn-success mb-2"
+                                        className="btn btn-success mb-2 me-2"
                                         onClick={() => {
                                             actions.setOrder();
                                             onPaymentSelect();

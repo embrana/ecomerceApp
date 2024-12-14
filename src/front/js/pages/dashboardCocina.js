@@ -180,7 +180,11 @@ const DashboardCocina = () => {
                                 <img
                                   src={product.image || placeholderImage}
                                   alt={product.name || "Product"}
-                                  style={{ width: "50px" }}
+                                  style={{
+                                    width: "50px",       
+                                    height: "30px",      
+                                    objectFit: "cover",  
+                                  }}
                                 />
                               </td>
                               <td>{`$${product.price || 0}`}</td>
@@ -232,7 +236,11 @@ const DashboardCocina = () => {
                           <img
                             src={product.image || placeholderImage}
                             alt={product.name || "Item"}
-                            style={{ width: "50px" }}
+                            style={{
+                              width: "50px",      
+                              height: "30px",      
+                              objectFit: "cover",  
+                            }}
                           />
                         </td>
                         <td>

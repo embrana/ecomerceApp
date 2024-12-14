@@ -145,18 +145,6 @@ const AddMenu = () => {
               onChange={(e) => setMenu({ ...menu, description: e.target.value })}
               required
             ></textarea>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="active"
-                checked={menu.isActive}
-                onChange={(e) => setMenu({ ...menu, isActive: e.target.checked })}
-              />
-              <label className="form-check-label" htmlFor="active">
-                Activo
-              </label>
-            </div>
           </div>
         </div>
 

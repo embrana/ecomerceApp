@@ -1,15 +1,15 @@
-/* Floating button */
+
 .responsive-btn {
     height: 2rem;
     width: 2rem;
     text-align: center;
-    display: flex;  /* Use flexbox */
-    justify-content: center;  /* Center horizontally */
-    align-items: center;  /* Center vertically */
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
     position: fixed;
     bottom: 20px;
     right: 20px;
-    padding: 0;  /* Adjust padding to avoid extra space around icon */
+    padding: 0;  
     background-color: #ff5722;
     color: #fff;
     font-weight: bold;
