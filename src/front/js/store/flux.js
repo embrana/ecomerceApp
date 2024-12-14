@@ -65,7 +65,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     setStore({
                         token: data.token,
                         user_type: data.user_type,
-                        error: null, // Clear any existing error
+                        error: null, 
                     });
             
                     console.log("Session storage updated and state set.");
@@ -101,7 +101,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/orders");
                     if (data && Array.isArray(data.orders)) {
                         setStore({ orders: data.orders });
-                        console.log("Fetched products:", data);
                     } else {
                         console.error("Unexpected response format:", data);
                         setStore({ orders: [] });
@@ -117,7 +116,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                     const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/orders");
                     if (data && Array.isArray(data.orders)) {
                         setStore({ orders: data.orders });
-                        console.log("Fetched products:", data);
                     } else {
                         console.error("Unexpected response format:", data);
                         setStore({ orders: [] });
@@ -190,7 +188,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                     // Verifica si la solicitud fue exitosa
                     if (response.ok) {
                         const data = await response.json();
-                        console.log(data.msg);
             
                         // Actualiza el estado del producto en la lista
                         const updatedProducts = store.products.map((product) => {
@@ -242,7 +239,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                     }
             
                     const data = await response.json();
-                    console.log("Order created successfully:", data);
             
                     // Save the detailed order data in the store
                     setStore({ order_data: data, cart: [] });
@@ -295,7 +291,6 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const updatedCart = [...store.cart];
                 setStore({ cart: updatedCart });
                 localStorage.setItem("cart", JSON.stringify(updatedCart));
-                console.log("Cart updated:", updatedCart);
             },
             // Función para actualizar el carrito
             setCart: updatedCart => {
