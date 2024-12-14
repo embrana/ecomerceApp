@@ -2,7 +2,7 @@ const getState = ({ getStore, getActions, setStore }) => {
     return {
         store: {
             token: sessionStorage.getItem("auth_token") || null,
-            user_type:sessionStorage.getItem("user_type") || null,
+            user_type: sessionStorage.getItem("user_type") || null,
             error: null,
             products: [],
             cart: [],
@@ -100,6 +100,30 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
+            addReserve: async (reservas) => {
+                const token=getStore().token
+                try {
+                    const response = await fetch(process.env.BACKEND_URL + "api/reserve", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                         },
+                        body:JSON.stringify(reservas)
+                    });
+                    // if (data && Array.isArray(data.reserve)) {
+                    //     setStore({ reserve: data.reserve });
+                    //     console.log("Fetched products:", data);
+                    // } else {
+                    //     console.error("Unexpected response format:", data);
+                    //     setStore({ reserve: [] });
+                    // }
+                    console.log(response)
+                } catch (error) {
+                    console.error("Error fetching reserve:", error);
+                    setStore({ reserve: [] });
+                }
+            },
+
             // Publish a new product
             publishProduct: async (formData) => {
                 try {
@@ -164,10 +188,10 @@ const getState = ({ getStore, getActions, setStore }) => {
             updateOrderInStore: (updatedOrder) => {
                 const store = getStore();
                 const updatedOrders = store.orders.map((order) =>
-                  order.id === updatedOrder.id ? updatedOrder : order
+                    order.id === updatedOrder.id ? updatedOrder : order
                 );
                 setStore({ orders: updatedOrders });
-              },
+            },
 
             getProducts: async () => {
                 try {
