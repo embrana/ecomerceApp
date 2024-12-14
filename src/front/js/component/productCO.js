@@ -1,39 +1,23 @@
-import React, { useContext, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext } from "react";
 import { Context } from "../store/appContext";
-import "../../styles/cart.css"
+import "../../styles/cart.css";
 
-const ProductCO = () => {
+const ProductCO = ({ onPaymentSelect }) => {
     const { store, actions } = useContext(Context);
 
-    const handleQuantityChange = (index, value) => {
-        const updatedCart = store.cart.map((item, idx) => {
-            if (idx === index) {
-                return { ...item, quantity: Math.max(1, value) };
-            }
-            return item;
-        });
-
-        actions.setCart(updatedCart);
-    };
-
-    // Calcular el total basándose en store.cart
     const calculateTotal = () => {
         return store.cart.reduce((total, item) => total + item.price * (item.quantity || 1), 0);
     };
 
     return (
-        
-        <div className="container my-4" style={{ maxWidth: "400px", margin: "0 auto" }}>
-            <div className="row border">
-                <div className="col-12">
-                    <div className="panel panel-info mt-2">
-                        <div className="panel-heading">
-                            <div className="panel-title text-center">
-                                <p className="fs-5 fw-bold">
-                                    <i className="fa-solid fa-cart-shopping"></i> Shopping Cart
-                                </p>
-                            </div>
+        <div className="container my-4">
+            <div className="row justify-content-center">
+                <div className="col-12 col-sm-10 col-md-8 col-lg-6"> {/* Center the cart */}
+                    <div className="panel panel-info">
+                        <div className="panel-heading text-center mt-2">
+                            <p className="fs-5 fw-bold">
+                                <i className="fa-solid fa-cart-shopping"></i> Shopping Cart
+                            </p>
                         </div>
 
                         <div className="panel-body mt-2">
@@ -44,7 +28,7 @@ const ProductCO = () => {
                                         key={index}
                                         style={{ fontSize: "0.9rem" }}
                                     >
-                                        {/* Imagen del producto */}
+                                        {/* Product Image */}
                                         <div className="flex-shrink-0" style={{ width: "60px" }}>
                                             <img
                                                 className="img-fluid"
@@ -54,13 +38,13 @@ const ProductCO = () => {
                                             />
                                         </div>
 
-                                        {/* Nombre y precio del producto */}
+                                        {/* Product Name and Price */}
                                         <div className="flex-grow-1 ms-2">
                                             <h6 className="mb-1 text-truncate">{item.name}</h6>
                                             <p className="mb-0 text-muted">${item.price}</p>
                                         </div>
 
-                                        {/* Selector de cantidad bloqueado */}
+                                        {/* Quantity Input */}
                                         <div className="d-flex align-items-center">
                                             <input
                                                 type="number"
@@ -70,7 +54,7 @@ const ProductCO = () => {
                                             />
                                         </div>
 
-                                        {/* Botón eliminar */}
+                                        {/* Remove Button */}
                                         <button
                                             type="button"
                                             className="btn btn-link btn-sm text-danger"
@@ -85,7 +69,7 @@ const ProductCO = () => {
                             )}
                         </div>
 
-                        {/* Footer del carrito */}
+                        {/* Cart Footer */}
                         <div className="panel-footer mt-3">
                             <div className="row align-items-center">
                                 <div className="col-6 text-start">
@@ -95,17 +79,24 @@ const ProductCO = () => {
                                 </div>
 
                                 <div className="col-6 text-end">
+                                    {/* Payment Buttons */}
                                     <button
                                         type="button"
                                         className="btn btn-success mb-2"
-                                        onClick={() => actions.setOrder()}
+                                        onClick={() => {
+                                            actions.setOrder();
+                                            onPaymentSelect();
+                                        }}
                                     >
                                         Pagar en Efectivo
                                     </button>
                                     <button
                                         type="button"
                                         className="btn btn-success mb-2"
-                                        onClick={() => actions.setOrder()}
+                                        onClick={() => {
+                                            actions.setOrder();
+                                            onPaymentSelect();
+                                        }}
                                     >
                                         Mercado Pago
                                     </button>
@@ -120,4 +111,3 @@ const ProductCO = () => {
 };
 
 export default ProductCO;
-

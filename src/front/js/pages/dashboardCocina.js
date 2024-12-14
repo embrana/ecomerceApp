@@ -214,6 +214,7 @@ const DashboardCocina = () => {
                     <th>Stock</th>
                     <th>Precio</th>
                     <th>Imagen</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -233,6 +234,15 @@ const DashboardCocina = () => {
                             alt={product.name || "Item"}
                             style={{ width: "50px" }}
                           />
+                        </td>
+                        <td>
+                          <button
+                            className={`btn btn-sm ${product.is_active ? "btn-success" : "btn-secondary"}`}
+                            type="button"
+                            onClick={() => actions.toggleProductActive(product.id)}
+                          >
+                            {product.is_active ? "Activo" : "Inactivo"}
+                          </button>
                         </td>
                       </tr>
                     ))

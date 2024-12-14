@@ -161,6 +161,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                             "Authorization": `Bearer ${getStore().token}`,
                         },
                         body: formData,
+                      
                     });
 
                     if (!response.ok) {
@@ -175,6 +176,43 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
+            toggleProductActive: async (productId) => {
+                const store = getStore(); // Obtiene el store actual
+                try {
+                    // Realiza una solicitud PATCH al endpoint
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/product/toggle_active/${productId}`, {
+                        method: "PATCH",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    });
+            
+                    // Verifica si la solicitud fue exitosa
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log(data.msg);
+            
+                        // Actualiza el estado del producto en la lista
+                        const updatedProducts = store.products.map((product) => {
+                            if (product.id === productId) {
+                                return { ...product, is_active: !product.is_active }; // Invierte is_active
+                            }
+                            return product;
+                        });
+                        setStore({ products: updatedProducts });
+            
+                        return true; // Indica éxito
+                    } else {
+                        const errorText = await response.text(); // Maneja errores del servidor
+                        console.error(`Error: ${errorText}`);
+                        return false; // Indica fallo
+                    }
+                } catch (error) {
+                    console.error("Error while toggling product active status:", error);
+                    return false; // Indica fallo
+                }
+            },
+            
             setOrder: async () => {
                 const store = getStore();
                 const actions = getActions();

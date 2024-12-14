@@ -122,6 +122,27 @@ def create_product():
 
     return jsonify({"msg": "Product created successfully"}), 200
 
+@api.route('/product/toggle_active/<int:product_id>', methods=['PATCH'])
+def toggle_product_active(product_id):
+    try:
+        # Buscar el producto por ID
+        product = Product.query.get(product_id)
+        if not product:
+            raise APIException("Product not found", status_code=404)
+        
+        # Cambiar el estado de is_active al valor contrario
+        product.is_active = not product.is_active
+        
+        # Guardar los cambios en la base de datos
+        db.session.commit()
+        
+        # Devolver una respuesta indicando el nuevo estado
+        return jsonify({"msg": f"Product with ID {product_id} is now {'active' if product.is_active else 'inactive'}"}), 200
+    except Exception as e:
+        raise APIException(f"Unexpected error: {str(e)}", status_code=500)
+
+
+
 @api.route('/products', methods=['GET'])
 def get_products():
     """

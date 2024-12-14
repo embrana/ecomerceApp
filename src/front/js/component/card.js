@@ -6,6 +6,9 @@ const Card = ({ item }) => {
     const { actions } = useContext(Context);
     const [loading, setLoading] = useState(false);
 
+    // Condicional para no renderizar productos inactivos
+    if (!item.is_active) return null;
+
     const handleAddToCart = async () => {
         setLoading(true);
         await actions.addToCart(item);

@@ -1,16 +1,15 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
 import "../../styles/cart.css";
 
-function toggleCheckout() {
-    const checkoutSection = document.querySelector(".checkout");
-    checkoutSection.style.display =
-        checkoutSection.style.display === "block" ? "none" : "block";
-}
-
 const Cart = () => {
     const { store, actions } = useContext(Context);
+    const [isCartVisible, setIsCartVisible] = useState(false);
+
+    const toggleCartVisibility = () => {
+        setIsCartVisible(!isCartVisible);
+    };
 
     const handleQuantityChange = (productId, value) => {
         if (value < 1) return;
@@ -38,14 +37,11 @@ const Cart = () => {
                 key={item.product_id}
                 style={{ overflow: "hidden", padding: "0.5rem" }}
             >
-
-                {/* Product Name and Price */}
                 <div className="flex-grow-1 ms-3">
                     <h6 className="mb-1 text-truncate">{item.name}</h6>
                     <p className="mb-0 text-muted">${item.price}</p>
                 </div>
 
-                {/* Quantity Selector */}
                 <div className="d-flex align-items-center">
                     <input
                         type="number"
@@ -63,7 +59,6 @@ const Cart = () => {
                     />
                 </div>
 
-                {/* Remove Button */}
                 <div className="ms-2">
                     <button
                         type="button"
@@ -83,41 +78,54 @@ const Cart = () => {
     };
 
     return (
-        <div className="container my-4">
-            
+        <>
+            {/* Floating Button for Mobile */}
+            <button
+                className="responsive-btn"
+                onClick={toggleCartVisibility}
+                aria-label="Toggle Cart"
+            >
+                <i className="fa-solid fa-cart-shopping"></i>
+            </button>
+
             {/* Cart Section */}
-            <div className="card shadow-sm rounded border-0">
-                <div className="card-header bg-secondary text-white text-center">
-                    <h5>
-                        <i className="fa-solid fa-cart-shopping me-2"></i> Shopping Cart
-                    </h5>
-                </div>
-                <div className="card-body">{renderCartItems()}</div>
-                <div className="card-footer">
-                    <div className="row align-items-center">
-                        <div className="col-6">
-                            <h6 className="m-0">
-                                Total:{" "}
-                                <strong>
-                                    $
-                                    {store.cart.reduce(
-                                        (total, item) => total + item.price * item.quantity,
-                                        0
-                                    )}
-                                </strong>
-                            </h6>
-                        </div>
-                        <div className="col-6 text-end">
-                            <Link to="/checkout">
-                                <button className="btn btn-success">Checkout</button>
-                            </Link>
+            <div
+                className={`checkout ${isCartVisible ? "visible" : "hidden"}`}
+            >
+                <div className="card shadow-sm rounded border-0">
+                    <div className="card-header bg-secondary text-white text-center">
+                        <h5>
+                            <i className="fa-solid fa-cart-shopping me-2"></i> Shopping Cart
+                        </h5>
+                    </div>
+                    <div className="card-body">{renderCartItems()}</div>
+                    <div className="card-footer">
+                        <div className="row align-items-center">
+                            <div className="col-6">
+                                <h6 className="m-0">
+                                    Total:{" "}
+                                    <strong>
+                                        $
+                                        {store.cart.reduce(
+                                            (total, item) => total + item.price * item.quantity,
+                                            0
+                                        )}
+                                    </strong>
+                                </h6>
+                            </div>
+                            <div className="col-6 text-end">
+                                <Link to="/checkout">
+                                    <button className="btn btn-success">Checkout</button>
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
 export default Cart;
+
 

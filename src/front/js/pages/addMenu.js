@@ -51,22 +51,24 @@ const AddMenu = () => {
         stock: "",
         description: "",
         isActive: true,
-        price:"",
+        price: "",
       });
       setImage(null);
     }
   };
 
   return (
-    <div className="container mt-5">
-      <div className="p-2 mb-2 bg-primary text-white text-center">Añadir Menu</div>
+    <div className="container mt-4">
+      <div className="p-3 mb-4 bg-primary text-white text-center rounded">
+        <h2>Añadir Menu</h2>
+      </div>
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
       <form onSubmit={handlePublishMenu}>
-        <div className="d-flex justify-content-between mt-4">
-          <div style={{ width: "49%" }}>
-            <div className="form-floating mb-2">
+        <div className="row g-4">
+          <div className="col-md-6">
+            <div className="form-floating mb-3">
               <input
                 type="text"
                 className="form-control"
@@ -77,9 +79,9 @@ const AddMenu = () => {
               />
               <label>Nombre del menu</label>
             </div>
-            <div className="d-flex mb-2">
+            <div className="d-flex gap-3 mb-3">
               <select
-                className="form-select me-2"
+                className="form-select"
                 value={menu.type}
                 onChange={(e) => setMenu({ ...menu, type: e.target.value })}
                 required
@@ -89,7 +91,6 @@ const AddMenu = () => {
                 <option value="Minutas">Minutas</option>
                 <option value="Bebidas">Bebidas</option>
               </select>
-              <label>Stock</label>
               <input
                 type="number"
                 className="form-control"
@@ -98,8 +99,7 @@ const AddMenu = () => {
                 onChange={(e) => setMenu({ ...menu, stock: e.target.value })}
                 required
               />
-              <label>Precio</label>
-               <input
+              <input
                 type="number"
                 className="form-control"
                 placeholder="Precio"
@@ -118,7 +118,7 @@ const AddMenu = () => {
               <label className="input-group-text">Upload</label>
             </div>
             {image && (
-              <div className="mt-2">
+              <div className="mt-2 text-center">
                 <img
                   src={URL.createObjectURL(image)}
                   alt="Preview"
@@ -135,9 +135,10 @@ const AddMenu = () => {
               </div>
             )}
           </div>
-          <div style={{ width: "50%" }}>
+
+          <div className="col-md-6">
             <textarea
-              className="form-control mb-2"
+              className="form-control mb-3"
               placeholder="Dia y Descripcion del plato"
               style={{ height: "200px" }}
               value={menu.description}
@@ -158,21 +159,30 @@ const AddMenu = () => {
             </div>
           </div>
         </div>
-        <div className="d-flex justify-content-end mt-3">
+
+        <div className="d-flex justify-content-between mt-3">
+          <div>
+        <Link to={"/dashboard/cocina"}>
+          <button type="button" className="btn btn-outline-primary">
+            Volver
+          </button>
+        </Link>
+        <Link to={"/menu"}>
+          <button type="button" className="btn btn-outline-primary ms-2">
+            Compra Menu
+          </button>
+        </Link>
+        </div>
+        <div>
           <button type="reset" className="btn btn-secondary me-2">
             Cancelar
           </button>
           <button type="submit" className="btn btn-primary">
             Aceptar
           </button>
+          </div>
         </div>
       </form>
-      <Link to={"/dashboard/cocina"}>
-      <button type="submit" className="btn btn-primary">Volver</button>
-      </Link>
-      <Link to={"/menu"}>
-      <button type="submit" className="btn btn-primary">Compra Menu</button>
-      </Link>
     </div>
   );
 };

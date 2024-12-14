@@ -1,6 +1,5 @@
 import React, { useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
-import rigoImageUrl from "../../img/rigo-baby.jpg";
 import "../../styles/home.css";
 
 export const Home = () => {
@@ -11,10 +10,10 @@ export const Home = () => {
     }, []);
 
     return (
-        <div className="text-center mt-5">
-            <h1>Bienvenidos a la app de gestion del comedor!</h1>
-            <p>
-                <img src={rigoImageUrl} />
+        <div className="text-center mt-5 d-flex justify-content-center flex-wrap flex-column align-items-center">
+            <h1 className="text-center mb-4">Bienvenidos a la app de gestion del comedor!</h1>
+            <p style={{ backgroundColor: '#4364dd', padding: '10px', borderRadius: '5px', width: '40%', }}>
+                <img src="https://anda.com.uy/wp-content/themes/Divi-child/images/logo-anda.svg" alt="Logo" />
             </p>
 
         </div>
