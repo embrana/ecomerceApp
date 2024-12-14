@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 
-// Componente de Carrito de Reservas
+
+// Componente para mostrar el carrito de reservas
 const ReservationCart = ({ reservas }) => {
   return (
     <div>
@@ -18,72 +20,98 @@ const ReservationCart = ({ reservas }) => {
 };
 
 function Dining() {
+  const { store, actions } = useContext(Context);
+  const nuevaReserva = {
+    id: "",
+    fecha: "",
+    hora: ""
+
+  }
+  // Estado para las reservas. Se recuperan del localStorage si existen.
   const [reservas, setReservas] = useState(() => {
     const reservasGuardadas = localStorage.getItem("reservas");
     return reservasGuardadas ? JSON.parse(reservasGuardadas) : [];
   });
+
+  // Estado para la fecha y hora seleccionadas en el formulario
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
+
+  // Estado para la alerta de concurrencia y los mensajes de error
   const [alertaConcurrencia, setAlertaConcurrencia] = useState("");
   const [mostrarAlerta, setMostrarAlerta] = useState(false);
-  const [mostrarError, setMostrarError] = useState(false); // Nuevo estado para el error
-  const [carrito, setCarrito] = useState([]);
+  const [mostrarError, setMostrarError] = useState(false); // Estado para mostrar alerta de error
+  const [carrito, setCarrito] = useState([]); // Carrito de reservas
 
+  // Función para generar los horarios disponibles en intervalos de 30 minutos
   const generarHorarios = () => {
     const horarios = [];
-    let horaActual = 7 * 60;
-    const horaFinal = 18 * 60;
+    let horaActual = 7 * 60; // 7:00 AM en minutos
+    const horaFinal = 18 * 60; // 6:00 PM en minutos
 
     while (horaActual <= horaFinal) {
       const horas = Math.floor(horaActual / 60);
       const minutos = horaActual % 60;
+      // Añadir cada horario disponible en formato HH:mm
       horarios.push(
         `${horas.toString().padStart(2, "0")}:${minutos.toString().padStart(2, "0")}`
       );
-      horaActual += 30;
+      horaActual += 30; // Avanzar 30 minutos
     }
 
     return horarios;
   };
 
-  const horariosDisponibles = generarHorarios();
+  const horariosDisponibles = generarHorarios(); // Lista de horarios generados
 
+  // Función para agregar una nueva reserva
   const agregarReserva = (e) => {
     e.preventDefault();
-    // Mostrar alerta de error si falta fecha o hora
+    // Verificar que tanto la fecha como la hora estén seleccionadas
     if (!fecha || !hora) {
-      setMostrarError(true);
+      setMostrarError(true); // Mostrar error si falta algún dato
       return;
     }
 
-    const nuevaReserva = { id: Date.now(), fecha, hora };
+    // Crear una nueva reserva con un ID único (usando Date.now())
+    nuevaReserva = { id: Date.now(), fecha, hora };
     const nuevasReservas = [...reservas, nuevaReserva];
+
+    // Actualizar el estado de las reservas y guardarlas en el localStorage
     setReservas(nuevasReservas);
     localStorage.setItem("reservas", JSON.stringify(nuevasReservas));
+
+    // Mostrar la alerta y ocultar el error
     setMostrarAlerta(true);
-    setMostrarError(false); // Ocultar la alerta de error
+    setMostrarError(false);
+
+    // Limpiar los campos de fecha y hora
     setFecha("");
     setHora("");
   };
 
+  // useEffect para verificar la concurrencia de reservas al agregar una nueva
   useEffect(() => {
     if (mostrarAlerta) {
+      // Filtrar las reservas que coinciden con la fecha y hora seleccionadas
       const reservasEnHorario = reservas.filter(
         (reserva) => reserva.fecha === fecha && reserva.hora === hora
       ).length;
 
+      // Determinar el nivel de concurrencia
       if (reservasEnHorario >= 30) {
-        setAlertaConcurrencia("alta");
+        setAlertaConcurrencia("alta"); // Alta concurrencia
       } else if (reservasEnHorario >= 15) {
-        setAlertaConcurrencia("media");
+        setAlertaConcurrencia("media"); // Media concurrencia
       } else {
-        setAlertaConcurrencia("baja");
+        setAlertaConcurrencia("baja"); // Baja concurrencia
       }
     }
-  }, [reservas, fecha, hora, mostrarAlerta]);
+  }, [reservas, fecha, hora, mostrarAlerta]); // Dependencias del useEffect
 
+  // Función para renderizar la alerta dependiendo del nivel de concurrencia o error
   const renderizarAlerta = () => {
-    if (!mostrarAlerta && !mostrarError) return null;
+    if (!mostrarAlerta && !mostrarError) return null; // No mostrar alerta si no es necesario
 
     const estilosAlerta = {
       padding: "1rem",
@@ -92,16 +120,17 @@ function Dining() {
       alignItems: "center",
       backgroundColor:
         alertaConcurrencia === "alta"
-          ? "#dc3545"
+          ? "#dc3545" // Rojo para alta concurrencia
           : alertaConcurrencia === "media"
-            ? "#ffc107"
+            ? "#ffc107" // Amarillo para media concurrencia
             : alertaConcurrencia === "baja"
-              ? "#0d6efd"
-              : "#f8d7da", // Color rojo para la alerta de error
+              ? "#0d6efd" // Azul para baja concurrencia
+              : "#ff5833", // Rojo para el error
       color: "white",
       margin: "1rem 0",
     };
 
+    // Determinar el mensaje a mostrar
     let mensaje = "";
     if (mostrarError) {
       mensaje = "Seleccione fecha y horario";
@@ -131,46 +160,56 @@ function Dining() {
     );
   };
 
+  // Función para cancelar todas las reservas
   const cancelarReservas = () => {
-    setReservas([]);
-    localStorage.removeItem("reservas");
-    setFecha("");
-    setHora("");
+    setReservas([]); // Vaciar el estado de reservas
+    localStorage.removeItem("reservas"); // Eliminar las reservas del localStorage
+    setFecha(""); // Limpiar el campo de fecha
+    setHora(""); // Limpiar el campo de hora
   };
 
+  // Función para agregar una reserva al carrito
   const agregarAlCarrito = () => {
     if (fecha && hora) {
-      setCarrito([...carrito, { fecha, hora }]);
-      setFecha("");
-      setHora("");
+      setCarrito([...carrito, { fecha, hora }]); // Añadir la reserva al carrito
+      setFecha(""); // Limpiar el campo de fecha
+      setHora(""); // Limpiar el campo de hora
     }
   };
 
+  // Función para eliminar una reserva
   const eliminarReserva = (id) => {
     const nuevasReservas = reservas.filter((reserva) => reserva.id !== id);
-    setReservas(nuevasReservas);
-    localStorage.setItem("reservas", JSON.stringify(nuevasReservas));
+    setReservas(nuevasReservas); // Actualizar el estado de las reservas
+    localStorage.setItem("reservas", JSON.stringify(nuevasReservas)); // Guardar en localStorage
   };
 
+  const agregar = async (e) => {
+    e.preventDefault()
+    await actions.addReserve(nuevaReserva)//con action buscamos en flux//
+  }
   return (
     <div className="App">
+      {/* Formulario para agregar una nueva reserva */}
       <form
         className="d-flex justify-content-between my-4 flex-column flex-md-row"
         style={{ width: "100%" }}
         onSubmit={agregarReserva}
       >
         <div className="d-flex flex-column flex-md-row w-100">
+          {/* Campo de fecha */}
           <div className="d-flex align-items-center m-2">
             <i className="fa-solid fa-calendar-day me-2"></i>
             <input
               type="date"
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
-              min={new Date().toISOString().split("T")[0]}
+              min={new Date().toISOString().split("T")[0]} // No permitir fechas anteriores a hoy
               className="form-control"
             />
           </div>
 
+          {/* Campo de hora */}
           <div className="d-flex align-items-center m-2">
             <i className="fa-solid fa-clock me-2"></i>
             <select
@@ -188,21 +227,24 @@ function Dining() {
           </div>
         </div>
 
-        {/* Botón Add Reservation */}
+        {/* Botón para agregar la reserva */}
         <button
           className="btn btn-primary btn-lg ms-md-auto m-2 p-1 w-auto"
-          type="submit"
+          type="button"
           style={{
             whiteSpace: "nowrap",  // Evita que el texto se divida en varias líneas
           }}
+          onClick={(e) =>
+            agregar(e)
+          }
         >
           Reservar
         </button>
-
       </form>
 
       {renderizarAlerta()}
 
+      {/* Lista de reservas actuales */}
       <ul>
         {reservas.map((reserva) => (
           <li key={reserva.id} className="d-flex justify-content-between align-items-center">
@@ -218,11 +260,12 @@ function Dining() {
         ))}
       </ul>
 
+      {/* Mostrar el carrito de reservas */}
       <h1>
         {carrito.length > 0 && <ReservationCart reservas={carrito} />}
       </h1>
 
-      {/* Botones Cancelar y Reservar */}
+      {/* Botones de cancelar y reservar */}
       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
         <button
           className="btn btn-secondary me-md-2 w-100 w-md-auto h-100"
