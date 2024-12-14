@@ -26,6 +26,7 @@ const injectContext = PassedComponent => {
              */
             state.actions.initializeCart();
             state.actions.getMessage();
+            
         }, []);
 
         return (

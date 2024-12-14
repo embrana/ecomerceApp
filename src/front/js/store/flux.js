@@ -7,6 +7,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             products: [],
             cart: [],
             orders: [],
+            order_data: [],
             reserve: [],
         },
         actions: {
@@ -47,20 +48,30 @@ const getState = ({ getStore, getActions, setStore }) => {
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ email, password }),
                     });
-
+            
                     if (!response.ok) {
                         const errorData = await response.json();
                         setStore({ error: errorData.msg });
                         return { success: false };
                     }
-
+            
                     const data = await response.json();
+            
+                    // Store the token and user type in sessionStorage
                     sessionStorage.setItem("auth_token", data.token);
                     sessionStorage.setItem("user_type", data.user_type);
-
-                    setStore({ token: data.token, error: null });
-                    setStore({ user_type: data.user_type, error: null });
-
+            
+                    // Update the store with token and user_type
+                    setStore({
+                        token: data.token,
+                        user_type: data.user_type,
+                        error: null, // Clear any existing error
+                    });
+            
+                    console.log("Session storage updated and state set.");
+                   
+            
+                    // Return success and the URL to redirect to
                     return { success: true, redirectUrl: data.redirect_url };
                 } catch (error) {
                     console.error("Login error:", error);
@@ -68,6 +79,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false };
                 }
             },
+            
 
             logout: () => {
                 sessionStorage.removeItem("auth_token");
@@ -84,6 +96,22 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             // Fetch orders
+            getOrders: async () => {
+                try {
+                    const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/orders");
+                    if (data && Array.isArray(data.orders)) {
+                        setStore({ orders: data.orders });
+                        console.log("Fetched products:", data);
+                    } else {
+                        console.error("Unexpected response format:", data);
+                        setStore({ orders: [] });
+                    }
+                } catch (error) {
+                    console.error("Error fetching orders:", error);
+                    setStore({ orders: [] });
+                }
+            },
+             // Fetch orders
             getOrders: async () => {
                 try {
                     const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/orders");
@@ -147,19 +175,19 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            // Place an order
             setOrder: async () => {
                 const store = getStore();
-                const consolidatedCart = getActions().consolidateCart(store.cart);
-
-                console.log("Consolidated cart data:", consolidatedCart);
+                const actions = getActions();
+            
+                const consolidatedCart = actions.consolidateCart(store.cart);
+            
                 try {
                     const token = store.token;
                     if (!token) {
                         console.error("Token not found. Please log in.");
                         return { success: false, message: "User token not available." };
                     }
-
+            
                     const response = await fetch(`${process.env.BACKEND_URL}/api/orders`, {
                         method: "POST",
                         headers: {
@@ -168,18 +196,21 @@ const getState = ({ getStore, getActions, setStore }) => {
                         },
                         body: JSON.stringify({ cart: consolidatedCart }),
                     });
-
+            
                     if (!response.ok) {
                         const errorData = await response.json();
                         console.error("API Error:", errorData);
                         return { success: false, message: errorData.msg || "Failed to create order." };
                     }
-
+            
                     const data = await response.json();
                     console.log("Order created successfully:", data);
-                    setStore({ cart: [] }); // Clear cart after successful order
+            
+                    // Save the detailed order data in the store
+                    setStore({ order_data: data, cart: [] });
                     localStorage.removeItem("cart");
-                    return { success: true, message: data.msg || "Order created successfully.", orderNumber: data.order_number };
+            
+                    return { success: true, message: "Order created successfully.", order: data };
                 } catch (error) {
                     console.error("Error during API call:", error);
                     return { success: false, message: "An error occurred while creating the order." };

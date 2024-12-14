@@ -29,14 +29,29 @@ export const Menu = () => {
 
                         return (
                             <div className="mb-5" key={idx}>
-                                <h2 className={`text-center text-${category.color} mb-4`}>
-                                    {category.title}
-                                </h2>
+                                <div className={`card shadow-sm bg-${category.color} text-white mb-4`}>
+                                    <div className="card-body text-center">
+                                        <h2 className="card-title m-0">{category.title}</h2>
+                                    </div>
+                                </div>
                                 <div className="row g-4">
                                     {filteredProducts.length > 0 ? (
                                         filteredProducts.map((product, index) => (
                                             <div className="col-sm-6 col-md-4" key={index}>
-                                                <Card item={product} />
+                                                <div
+                                                    className="card shadow-sm h-100 border-0"
+                                                    style={{
+                                                        transition: "transform 0.3s",
+                                                    }}
+                                                    onMouseEnter={(e) =>
+                                                        (e.currentTarget.style.transform = "scale(1.05)")
+                                                    }
+                                                    onMouseLeave={(e) =>
+                                                        (e.currentTarget.style.transform = "scale(1)")
+                                                    }
+                                                >
+                                                    <Card item={product} />
+                                                </div>
                                             </div>
                                         ))
                                     ) : (

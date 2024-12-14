@@ -5,11 +5,8 @@ import "../../styles/cart.css";
 
 function toggleCheckout() {
     const checkoutSection = document.querySelector(".checkout");
-    if (checkoutSection.style.display === "block") {
-        checkoutSection.style.display = "none";
-    } else {
-        checkoutSection.style.display = "block";
-    }
+    checkoutSection.style.display =
+        checkoutSection.style.display === "block" ? "none" : "block";
 }
 
 const Cart = () => {
@@ -22,16 +19,12 @@ const Cart = () => {
             item.product_id === productId ? { ...item, quantity: value } : item
         );
 
-        actions.setCart(updatedCart); // Update cart in store
-        console.log("Cart updated with new quantity:", updatedCart);
+        actions.setCart(updatedCart);
     };
 
     const handleRemove = (productId) => {
-        // Filter out the item to be removed
         const updatedCart = store.cart.filter((item) => item.product_id !== productId);
-
-        actions.setCart(updatedCart); // Update cart in store
-        console.log("Item removed, updated cart:", updatedCart);
+        actions.setCart(updatedCart);
     };
 
     const renderCartItems = () => {
@@ -41,41 +34,19 @@ const Cart = () => {
 
         return store.cart.map((item) => (
             <div
-                className="d-flex align-items-center border-bottom py-2"
+                className="d-flex align-items-center border-bottom py-2 shadow-sm bg-light rounded"
                 key={item.product_id}
-                style={{ fontSize: "0.9rem" }}
+                style={{ overflow: "hidden", padding: "0.5rem" }}
             >
-                {/* Product Image */}
-                <div className="flex-shrink-0" style={{ width: "60px" }}>
-                    <img
-                        className="img-fluid"
-                        src={item.image || "https://via.placeholder.com/150x100"}
-                        alt="Product"
-                        style={{
-                            width: "60px",
-                            height: "40px",
-                            objectFit: "cover",
-                        }}
-                    />
-                </div>
 
                 {/* Product Name and Price */}
-                <div className="flex-grow-1 ms-2">
+                <div className="flex-grow-1 ms-3">
                     <h6 className="mb-1 text-truncate">{item.name}</h6>
                     <p className="mb-0 text-muted">${item.price}</p>
                 </div>
 
                 {/* Quantity Selector */}
                 <div className="d-flex align-items-center">
-                    <button
-                        type="button"
-                        className="btn btn-outline-secondary btn-sm"
-                        onClick={() =>
-                            handleQuantityChange(item.product_id, item.quantity - 1)
-                        }
-                    >
-                        -
-                    </button>
                     <input
                         type="number"
                         className="form-control form-control-sm text-center mx-1"
@@ -84,24 +55,24 @@ const Cart = () => {
                             handleQuantityChange(item.product_id, Math.max(1, Number(e.target.value)))
                         }
                         min="1"
-                        style={{ width: "50px" }}
+                        style={{
+                            width: "40px",
+                            minWidth: "30px",
+                            maxWidth: "40px",
+                        }}
                     />
-                    <button
-                        type="button"
-                        className="btn btn-outline-secondary btn-sm"
-                        onClick={() =>
-                            handleQuantityChange(item.product_id, item.quantity + 1)
-                        }
-                    >
-                        +
-                    </button>
                 </div>
 
                 {/* Remove Button */}
                 <div className="ms-2">
                     <button
                         type="button"
-                        className="btn btn-link btn-sm text-danger"
+                        className="btn btn-danger btn-sm"
+                        style={{
+                            width: "30px",
+                            minWidth: "30px",
+                            padding: "0.2rem",
+                        }}
                         onClick={() => handleRemove(item.product_id)}
                     >
                         <i className="fa-solid fa-trash"></i>
@@ -112,85 +83,34 @@ const Cart = () => {
     };
 
     return (
-        <div className="container my-4" style={{ maxWidth: "400px", margin: "0 auto" }}>
-            <button className="responsive-btn" onClick={toggleCheckout}>
-                Cart
-            </button>
-            {/* Desktop Checkout */}
-            <div className="row border checkout">
-                <div className="col-12">
-                    <div className="panel panel-info mt-2">
-                        <div className="panel-heading">
-                            <div className="panel-title text-center">
-                                <p className="fs-5 fw-bold">
-                                    <i className="fa-solid fa-cart-shopping"></i> Shopping Cart
-                                </p>
-                            </div>
-                        </div>
-                        <div className="panel-body mt-2">{renderCartItems()}</div>
-                        <div className="panel-footer mt-3">
-                            <div className="row align-items-center">
-                                <div className="col-6 text-start">
-                                    <h5 style={{ fontSize: "1rem" }}>
-                                        Total:{" "}
-                                        <strong>
-                                            $
-                                            {store.cart.reduce(
-                                                (total, item) =>
-                                                    total + item.price * item.quantity,
-                                                0
-                                            )}
-                                        </strong>
-                                    </h5>
-                                </div>
-                                <div className="col-6 text-end">
-                                    <Link to={"/checkout"}>
-                                        <button type="button" className="btn btn-success">
-                                            Checkout
-                                        </button>
-                                    </Link>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <div className="container my-4">
+            
+            {/* Cart Section */}
+            <div className="card shadow-sm rounded border-0">
+                <div className="card-header bg-secondary text-white text-center">
+                    <h5>
+                        <i className="fa-solid fa-cart-shopping me-2"></i> Shopping Cart
+                    </h5>
                 </div>
-            </div>
-
-            {/* Mobile Checkout */}
-            <div className="row border checkout1">
-                <div className="col-12">
-                    <div className="panel panel-info mt-2">
-                        <div className="panel-heading">
-                            <div className="panel-title text-center">
-                                <p className="fs-5 fw-bold">
-                                    <i className="fa-solid fa-cart-shopping"></i> Shopping Cart
-                                </p>
-                            </div>
+                <div className="card-body">{renderCartItems()}</div>
+                <div className="card-footer">
+                    <div className="row align-items-center">
+                        <div className="col-6">
+                            <h6 className="m-0">
+                                Total:{" "}
+                                <strong>
+                                    $
+                                    {store.cart.reduce(
+                                        (total, item) => total + item.price * item.quantity,
+                                        0
+                                    )}
+                                </strong>
+                            </h6>
                         </div>
-                        <div className="panel-body mt-2">{renderCartItems()}</div>
-                        <div className="panel-footer mt-3">
-                            <div className="row align-items-center">
-                                <div className="col-6 text-start">
-                                    <h5 style={{ fontSize: "1rem" }}>
-                                        Total:{" "}
-                                        <strong>
-                                            $
-                                            {store.cart.reduce(
-                                                (total, item) =>
-                                                    total + item.price * item.quantity,
-                                                0
-                                            )}
-                                        </strong>
-                                    </h5>
-                                </div>
-                                <div className="col-6 text-end">
-                                    <Link to={"/checkout"}>
-                                        <button type="button" className="btn btn-success">
-                                            Checkout
-                                        </button>
-                                    </Link>
-                                </div>
-                            </div>
+                        <div className="col-6 text-end">
+                            <Link to="/checkout">
+                                <button className="btn btn-success">Checkout</button>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -200,3 +120,4 @@ const Cart = () => {
 };
 
 export default Cart;
+
