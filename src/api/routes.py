@@ -339,3 +339,43 @@ def create_reserve():
     except Exception as e:
         db.session.rollback()
         return jsonify({"msg": f"Failed to create reserve: {str(e)}"}), 500
+
+@api.route('/reserve', methods=['GET'])
+@jwt_required()
+def get_reserve():
+    """
+    Retrieve reserves for the currently authenticated user.
+    """
+    try:
+        # Get the current user's identity from the JWT
+        user_id = get_jwt_identity()
+        # Fetch reserves for the current user from the database
+        reserves = Reserve.query.filter_by(user_id=user_id).all()
+        # Handle the case when no reserves are found for this user
+        if not reserves:
+            return jsonify({"message": "No reserves found for this user"}), 404
+        # Serialize the reserves for the response
+        reserve_serialized = [reserve.serialize() for reserve in reserves]
+        # Return the serialized reserves with a 200 status
+        return jsonify({"Reserve": reserve_serialized}), 200
+    except Exception as e:
+        # Log the exception for debugging
+        print(f"Error in get_reserve: {e}")
+        # Return a 500 error for internal server issues
+        return jsonify({"msg": "Internal server error"}), 500
+
+# Endpoint to delete a reservation by ID
+@api.route('/reserve/<int:id>', methods=['DELETE'])
+def delete_reserves(id):
+    global reserve
+    # Find the reservation with the given ID
+    reservation_to_delete = next((r for r in reserve if r["id"] == id), None)
+    
+    if reservation_to_delete:
+        # Remove it from the list
+        reserve = [r for r in reserve if r["id"] != id]
+        return jsonify({"message": "Reservation deleted successfully", "id": id}), 200
+    else:
+        # Reservation not found
+        return jsonify({"error": "Reservation not found"}), 404
+

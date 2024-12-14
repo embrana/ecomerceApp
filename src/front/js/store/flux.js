@@ -131,24 +131,34 @@ const getState = ({ getStore, getActions, setStore }) => {
             addReserve: async (reservas) => {
                 const token=getStore().token
                 try {
-                    const response = await fetch(process.env.BACKEND_URL + "api/reserve", {
+                    const response = await fetch(process.env.BACKEND_URL + "/api/reserve", {
                         method: "POST",
                         headers: { "Content-Type": "application/json",
                             "Authorization": `Bearer ${token}`
                          },
                         body:JSON.stringify(reservas)
                     });
-                    // if (data && Array.isArray(data.reserve)) {
-                    //     setStore({ reserve: data.reserve });
-                    //     console.log("Fetched products:", data);
-                    // } else {
-                    //     console.error("Unexpected response format:", data);
-                    //     setStore({ reserve: [] });
-                    // }
                     console.log(response)
                 } catch (error) {
                     console.error("Error fetching reserve:", error);
                     setStore({ reserve: [] });
+                }
+            },
+
+            getReserves: async () => {
+                try {
+                    // Use the existing apiCall utility to fetch reserves
+                    const data = await getActions().apiCall(`${process.env.BACKEND_URL}/api/reserve`);
+                    // Check if the response is in the expected format
+                    if (data && Array.isArray(data.Reserve)) {
+                        setStore({ reserve: data.Reserve }); // Update the store with the fetched reserves
+                    } else {
+                        console.error("Unexpected response format for reserves:", data);
+                        setStore({ reserve: [] });
+                    }
+                } catch (error) {
+                    console.error("Error fetching reserves:", error);
+                    setStore({ reserve: [] }); // Clear reserves on error
                 }
             },
 
