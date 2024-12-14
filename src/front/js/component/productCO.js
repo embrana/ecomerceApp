@@ -1,29 +1,15 @@
-import React, { useContext, useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useContext } from "react";
 import { Context } from "../store/appContext";
-import "../../styles/cart.css"
+import "../../styles/cart.css";
 
-const ProductCO = () => {
+const ProductCO = ({ onPaymentSelect }) => {
     const { store, actions } = useContext(Context);
 
-    const handleQuantityChange = (index, value) => {
-        const updatedCart = store.cart.map((item, idx) => {
-            if (idx === index) {
-                return { ...item, quantity: Math.max(1, value) };
-            }
-            return item;
-        });
-
-        actions.setCart(updatedCart);
-    };
-
-    // Calcular el total basándose en store.cart
     const calculateTotal = () => {
         return store.cart.reduce((total, item) => total + item.price * (item.quantity || 1), 0);
     };
 
     return (
-        
         <div className="container my-4" style={{ maxWidth: "400px", margin: "0 auto" }}>
             <div className="row border">
                 <div className="col-12">
@@ -44,7 +30,6 @@ const ProductCO = () => {
                                         key={index}
                                         style={{ fontSize: "0.9rem" }}
                                     >
-                                        {/* Imagen del producto */}
                                         <div className="flex-shrink-0" style={{ width: "60px" }}>
                                             <img
                                                 className="img-fluid"
@@ -53,14 +38,10 @@ const ProductCO = () => {
                                                 style={{ width: "60px", height: "40px", objectFit: "cover" }}
                                             />
                                         </div>
-
-                                        {/* Nombre y precio del producto */}
                                         <div className="flex-grow-1 ms-2">
                                             <h6 className="mb-1 text-truncate">{item.name}</h6>
                                             <p className="mb-0 text-muted">${item.price}</p>
                                         </div>
-
-                                        {/* Selector de cantidad bloqueado */}
                                         <div className="d-flex align-items-center">
                                             <input
                                                 type="number"
@@ -69,8 +50,6 @@ const ProductCO = () => {
                                                 readOnly
                                             />
                                         </div>
-
-                                        {/* Botón eliminar */}
                                         <button
                                             type="button"
                                             className="btn btn-link btn-sm text-danger"
@@ -85,7 +64,6 @@ const ProductCO = () => {
                             )}
                         </div>
 
-                        {/* Footer del carrito */}
                         <div className="panel-footer mt-3">
                             <div className="row align-items-center">
                                 <div className="col-6 text-start">
@@ -93,19 +71,25 @@ const ProductCO = () => {
                                         Total: <strong>${calculateTotal()}</strong>
                                     </h5>
                                 </div>
-
                                 <div className="col-6 text-end">
+                                    {/* Trigger payment selection */}
                                     <button
                                         type="button"
                                         className="btn btn-success mb-2"
-                                        onClick={() => actions.setOrder()}
+                                        onClick={() => {
+                                            actions.setOrder(); // Set the order
+                                            onPaymentSelect(); // Notify parent
+                                        }}
                                     >
                                         Pagar en Efectivo
                                     </button>
                                     <button
                                         type="button"
                                         className="btn btn-success mb-2"
-                                        onClick={() => actions.setOrder()}
+                                        onClick={() => {
+                                            actions.setOrder(); // Set the order
+                                            onPaymentSelect(); // Notify parent
+                                        }}
                                     >
                                         Mercado Pago
                                     </button>
@@ -120,4 +104,3 @@ const ProductCO = () => {
 };
 
 export default ProductCO;
-

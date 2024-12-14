@@ -37,7 +37,7 @@ export const Navbar = () => {
     
 
 return (
-        <nav className="navbar navbar-light px-0" style={{ backgroundColor: '#4364dd'}}>
+        <nav className="navbar navbar-light px-0 w-100" style={{ backgroundColor: '#4364dd'}}>
             <div className="container-fluid mx-0">
                 {/* Logo */}
                 <Link to="/">
@@ -123,7 +123,7 @@ return (
                                 <Link to="/reserve">
                                     <button className="btn btn-light me-2">Comedor</button>
                                 </Link>
-                                {store.user_type && <Link to="/dashboard/cocina" className="text-decoration-none">
+                                {store.user_type && <Link to="/dashboard/cocina" className="text-decoration-none me-2">
                                                 <button className="btn btn-light w-100">Cocina Pedidos</button>
                                             </Link>}          
                                 <button
