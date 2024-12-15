@@ -148,8 +148,8 @@ const getState = ({ getStore, getActions, setStore }) => {
                     // Use the existing apiCall utility to fetch reserves
                     const data = await getActions().apiCall(`${process.env.BACKEND_URL}/api/reserve`);
                     // Check if the response is in the expected format
-                    if (data && Array.isArray(data.Reserve)) {
-                        setStore({ reserve: data.Reserve }); // Update the store with the fetched reserves
+                    if (data && Array.isArray(data.reserve)) {
+                        setStore({ reserve: data.reserve });
                     } else {
                         console.error("Unexpected response format for reserves:", data);
                         setStore({ reserve: [] });
@@ -159,6 +159,39 @@ const getState = ({ getStore, getActions, setStore }) => {
                     setStore({ reserve: [] }); // Clear reserves on error
                 }
             },
+
+            // Delete a reservation by ID
+            removeReserve: async (id) => {
+                const token = getStore().token;
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}/api/reserve/${id}`, {
+                        method: "DELETE",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`,
+                        },
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        setStore({ error: errorData.msg || "Failed to delete the reserve." });
+                        return { success: false };
+                    }
+
+                    // If the request is successful, remove the deleted reserve from the store
+                    setStore((store) => {
+                        const updatedReserves = store.reserve.filter((reserve) => reserve.id !== id);
+                        return { reserve: updatedReserves };
+                    });
+
+                    return { success: true };
+                } catch (error) {
+                    console.error("Error deleting reserve:", error);
+                    setStore({ error: "An error occurred while deleting the reserve." });
+                    return { success: false };
+                }
+            },
+
 
             // Publish a new product
             publishProduct: async (formData) => {

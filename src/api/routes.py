@@ -8,6 +8,8 @@ import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 import os
 
+
+
 cloudinary.config(
     cloud_name="dnmm7omko",
     api_key="412312661645263",
@@ -364,18 +366,21 @@ def get_reserve():
         # Return a 500 error for internal server issues
         return jsonify({"msg": "Internal server error"}), 500
 
-# Endpoint to delete a reservation by ID
 @api.route('/reserve/<int:id>', methods=['DELETE'])
 def delete_reserves(id):
-    global reserve
-    # Find the reservation with the given ID
-    reservation_to_delete = next((r for r in reserve if r["id"] == id), None)
-    
-    if reservation_to_delete:
-        # Remove it from the list
-        reserve = [r for r in reserve if r["id"] != id]
-        return jsonify({"message": "Reservation deleted successfully", "id": id}), 200
-    else:
-        # Reservation not found
-        return jsonify({"error": "Reservation not found"}), 404
-
+    try:
+        # Query the database for the reservation
+        reservation_to_delete = Reserve.query.get(id)
+        
+        if reservation_to_delete:
+            # Remove the reservation from the database
+            db.session.delete(reservation_to_delete)
+            db.session.commit()
+            return jsonify({"message": "Reservation deleted successfully", "id": id}), 200
+        else:
+            # If the reservation doesn't exist
+            return jsonify({"error": "Reservation not found"}), 404
+    except Exception as e:
+        # Handle any unexpected errors
+        print(f"Error deleting reservation: {e}")
+        return jsonify({"msg": "Internal server error"}), 500
