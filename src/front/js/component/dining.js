@@ -9,6 +9,23 @@ const Dining = () => {
   const [mostrarError, setMostrarError] = useState(false);
   const [alertaConcurrencia, setAlertaConcurrencia] = useState("baja");
 
+  // Generate time options (from 08:00 to 20:00 with 15-minute intervals)
+  const generateTimeOptions = () => {
+    const times = [];
+    for (let h = 8; h <= 20; h++) {
+      for (let m = 0; m < 60; m += 15) {
+        const time = new Date(0, 0, 0, h, m, 0).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        times.push(time);
+      }
+    }
+    return times;
+  };
+
+  const timeOptions = generateTimeOptions();
+
   // Fetch reservas on component mount
   useEffect(() => {
     actions.fetchReservas();
@@ -37,14 +54,37 @@ const Dining = () => {
       setMostrarError(true);
       return;
     }
-
-    const nuevaReserva = { date: `${fecha}T${hora}:00` };
+  
+    // Ensure the time is in 24-hour format without AM/PM
+    const timeParts = hora.split(":");
+    let hour = parseInt(timeParts[0], 10);
+    const minutes = timeParts[1].split(" ")[0]; // Remove AM/PM from the minutes part
+    const period = timeParts[1].split(" ")[1]; // Get AM/PM part
+  
+    // Convert 12-hour format to 24-hour format
+    if (period === "PM" && hour !== 12) {
+      hour += 12;  // Add 12 hours if it's PM
+    }
+    if (period === "AM" && hour === 12) {
+      hour = 0;  // Set hour to 00 if it's 12 AM
+    }
+  
+    // Format the hour and minutes to ensure correct format
+    let formattedHour = hour;
+    if (formattedHour < 10) {
+      formattedHour = `0${formattedHour}`; // Ensure two-digit hour
+    }
+  
+    const formattedTime = `${formattedHour}:${minutes}:00`;
+  
+    const nuevaReserva = { date: `${fecha}T${formattedTime}` };
     actions.addReserva(nuevaReserva);
     setFecha("");
     setHora("");
     setMostrarAlerta(true);
     setMostrarError(false);
   };
+  
 
   const eliminarReserva = (id) => {
     console.log("Deleting reserva with ID:", id);
@@ -96,13 +136,19 @@ const Dining = () => {
             </div>
             <div className="mb-3">
               <label className="form-label">Hora:</label>
-              <input
-                type="time"
+              <select
                 className="form-control"
                 value={hora}
                 onChange={(e) => setHora(e.target.value)}
                 required
-              />
+              >
+                <option value="">Seleccionar hora</option>
+                {timeOptions.map((time, index) => (
+                  <option key={index} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
             </div>
             <button type="submit" className="btn btn-primary">
               Reservar
