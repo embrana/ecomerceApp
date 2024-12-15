@@ -21,7 +21,9 @@ export const Menu = () => {
     const products = Array.isArray(store.products) ? store.products : [];
 
     return (
-        <div className="container-fluid my-5">
+        <div className="container-fluid my-5"
+            
+        >
             <div className="row">
                 {/* Sección de Productos */}
                 <div className="col-lg-8">

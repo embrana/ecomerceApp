@@ -318,29 +318,39 @@ def create_reserve():
     """
     Create a new reserve for the logged-in user.
     """
-    current_user_id = get_jwt_identity()  # This is now the user ID as a string
-    user = User.query.get(current_user_id)  # Fetch the user object
-
-    if not user:
-        return jsonify({"msg": "User not found"}), 404
-    
-    body = request.get_json()
-    date = body.get("date")
-
     try:
+        current_user_id = get_jwt_identity()  # This is now the user ID as a string
+        user = User.query.get(current_user_id)  # Fetch the user object
+        
+        if not user:
+            return jsonify({"msg": "User not found"}), 404
+
+        body = request.get_json()
+        date = body.get("date")
+
+        if not date:
+            return jsonify({"msg": "Date is required"}), 400
+
         # Create the reserve
-        reserve = Reserve(
-            user_id=user.id,
-            date=date
-        )
+        reserve = Reserve(user_id=user.id, date=date)
         db.session.add(reserve)
-         # Commit the transaction
-        db.session.commit()
-        return jsonify({"msg": "Reserve created successfully"}), 201
+        db.session.commit()  # Commit the transaction
+
+        # Serialize and return the reserve
+        def serialize_reserve(reserve):
+            return {
+                "id": reserve.id,
+                "user_id": reserve.user_id,
+                "date": reserve.date.isoformat()  # Format date to ISO string
+            }
+
+        return jsonify({"msg": "Reserve created successfully", "Reserve": serialize_reserve(reserve)}), 201
 
     except Exception as e:
+        print(f"Error while creating reserve: {e}")
         db.session.rollback()
         return jsonify({"msg": f"Failed to create reserve: {str(e)}"}), 500
+
 
 @api.route('/reserve', methods=['GET'])
 @jwt_required()
