@@ -43,7 +43,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             // Login action
             login: async (email, password) => {
                 try {
-                    const response = await fetch(process.env.BACKEND_URL + "/api/login", {
+                    const response = await fetch(process.env.BACKEND_URL + "api/login", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ email, password }),
@@ -98,7 +98,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             // Fetch orders
             getOrders: async () => {
                 try {
-                    const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/orders");
+                    const data = await getActions().apiCall(process.env.BACKEND_URL + "api/orders");
                     if (data && Array.isArray(data.orders)) {
                         setStore({ orders: data.orders });
                     } else {
@@ -114,7 +114,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             // Publish a new product
             publishProduct: async (formData) => {
                 try {
-                    const response = await fetch(process.env.BACKEND_URL + "/api/products", {
+                    const response = await fetch(process.env.BACKEND_URL + "api/products", {
                         method: "POST",
                         headers: {
                             "Authorization": `Bearer ${getStore().token}`,
@@ -139,7 +139,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const store = getStore(); // Obtiene el store actual
                 try {
                     // Realiza una solicitud PATCH al endpoint
-                    const response = await fetch(`${process.env.BACKEND_URL}/api/product/toggle_active/${productId}`, {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/product/toggle_active/${productId}`, {
                         method: "PATCH",
                         headers: {
                             "Content-Type": "application/json",
@@ -184,7 +184,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                         return { success: false, message: "User token not available." };
                     }
             
-                    const response = await fetch(`${process.env.BACKEND_URL}/api/orders`, {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/orders`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
@@ -221,7 +221,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             getProducts: async () => {
                 try {
-                    const response = await fetch(process.env.BACKEND_URL + "/api/products");
+                    const response = await fetch(process.env.BACKEND_URL + "api/products");
                     if (!response.ok) throw new Error("Failed to fetch products");
 
                     const data = await response.json();
@@ -279,7 +279,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             fetchReservas: async () => {
                 try {
-                  const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/reserve");
+                  const data = await getActions().apiCall(process.env.BACKEND_URL + "api/reserve");
                   console.log("Fetched reservas:", data); // Debug log
                   if (data && data.Reserve) {
                     setStore({ reservas: data.Reserve }); // Update store with data.Reserve
@@ -297,7 +297,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             addReserva: async (nuevaReserva) => {
                 try {
                     const data = await getActions().apiCall(
-                        process.env.BACKEND_URL + "/api/reserve",
+                        process.env.BACKEND_URL + "api/reserve",
                         {
                             method: "POST",
                             body: JSON.stringify(nuevaReserva),
@@ -313,7 +313,7 @@ const getState = ({ getStore, getActions, setStore }) => {
                 const store = getStore();
                 try {
                     // Send DELETE request to backend API
-                    const response = await fetch( process.env.BACKEND_URL + `/api/reserve/${id}`, {
+                    const response = await fetch( process.env.BACKEND_URL + `api/reserve/${id}`, {
                         method: 'DELETE',
                         headers: {
                             'Authorization': `Bearer ${store.token}`, // Include token if needed
@@ -338,7 +338,7 @@ const getState = ({ getStore, getActions, setStore }) => {
             
             getMessage: async () => {
                 try {
-                    const data = await getActions().apiCall(process.env.BACKEND_URL + "/api/hello");
+                    const data = await getActions().apiCall(process.env.BACKEND_URL + "api/hello");
                     setStore({ message: data.message });
                     return data;
                 } catch (error) {
