@@ -38,6 +38,7 @@ const Layout = () => {
                     <Navbar />
                     <Routes>
                         <Route element={<Home />} path="/" />
+                        <Route element={<Home />} path="/admin" />
                         <Route element={<Login />} path="/login" />
                         <Route path="/menu" element={
                             <ProtectedRoute>
