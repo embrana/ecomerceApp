@@ -16,7 +16,7 @@ const Card = ({ item }) => {
     };
 
     return (
-        <div className="card shadow-sm border-0 mx-auto cardC">
+        <div className="card w-100 shadow-sm border-0 mx-auto cardC">
             <img
                 src={item.image || "https://via.placeholder.com/150"}
                 className="card-img-top"
