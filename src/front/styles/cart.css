@@ -1,7 +1,7 @@
 
 .responsive-btn {
-    height: 2rem;
-    width: 2rem;
+    height: 4rem;
+    width: 4rem;
     text-align: center;
     display: flex; 
     justify-content: center; 
@@ -11,12 +11,18 @@
     right: 20px;
     padding: 0;  
     background-color: #ff5722;
+    font-size: 25px;
     color: #fff;
     font-weight: bold;
     border: none;
     border-radius: 50%;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     z-index: 10;
+}
+
+.cart-icon {
+    width: 3rem;
+    height: auto;
 }
 
 @media (max-width: 768px) {

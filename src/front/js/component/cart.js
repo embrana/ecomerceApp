@@ -85,7 +85,7 @@ const Cart = () => {
                 onClick={toggleCartVisibility}
                 aria-label="Toggle Cart"
             >
-                <i className="fa-solid fa-cart-shopping"></i>
+                <i className="fa-solid fa-cart-shopping cart-icon"></i>
             </button>
 
             {/* Cart Section */}
@@ -101,7 +101,7 @@ const Cart = () => {
                     <div className="card-body">{renderCartItems()}</div>
                     <div className="card-footer">
                         <div className="row align-items-center">
-                            <div className="col-6">
+                            <div className="col-5">
                                 <h6 className="m-0">
                                     Total:{" "}
                                     <strong>
@@ -113,7 +113,7 @@ const Cart = () => {
                                     </strong>
                                 </h6>
                             </div>
-                            <div className="col-6 text-end">
+                            <div className="col-5 text-start ps-0">
                                 <Link to="/checkout">
                                     <button className="btn btn-success">Checkout</button>
                                 </Link>

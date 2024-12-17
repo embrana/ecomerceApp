@@ -8,6 +8,7 @@ const DashboardCocina = () => {
   const [currentView, setCurrentView] = useState("orders");
   const [searchQuery, setSearchQuery] = useState("");
   const [message, setMessage] = useState(null);
+  const [isDateDescending, setIsDateDescending] = useState(true); // To toggle sorting
 
   useEffect(() => {
     actions.getOrders();
@@ -18,12 +19,23 @@ const DashboardCocina = () => {
     "https://res.cloudinary.com/dnmm7omko/image/upload/v1733842727/ubstteb7dmizj50zozse.webp";
 
   const calculateOrderTotal = (products) => {
-    return products?.reduce((sum, product) => sum + (product.price || 0) * (product.quantity || 1), 0).toFixed(2);
+    return products?.reduce(
+      (sum, product) =>
+        sum + (product.price || 0) * (product.quantity || 1),
+      0
+    ).toFixed(2);
   };
 
-  const filteredOrders = orders.filter((order) =>
-    order.order_number?.toString().toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter and sort orders
+  const filteredOrders = orders
+    .filter((order) =>
+      order.order_number?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return isDateDescending ? dateB - dateA : dateA - dateB;
+    });
 
   const filteredProducts = products.filter((product) =>
     product.name?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -93,7 +105,9 @@ const DashboardCocina = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <button className="btn btn-primary" type="submit">Buscar</button>
+                <button className="btn btn-primary" type="submit">
+                  Buscar
+                </button>
               </form>
             </div>
             <div className="d-flex">
@@ -126,7 +140,13 @@ const DashboardCocina = () => {
               <table className="table table-bordered">
                 <thead className="table-dark">
                   <tr>
-                    <th>Fecha</th>
+                    <th
+                      className="sortable"
+                      onClick={() => setIsDateDescending(!isDateDescending)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      Fecha {isDateDescending ? "▼" : "▲"}
+                    </th>
                     <th>Orden</th>
                     <th>Estado</th>
                     <th>Monto</th>
@@ -181,9 +201,9 @@ const DashboardCocina = () => {
                                   src={product.image || placeholderImage}
                                   alt={product.name || "Product"}
                                   style={{
-                                    width: "50px",       
-                                    height: "30px",      
-                                    objectFit: "cover",  
+                                    width: "50px",
+                                    height: "30px",
+                                    objectFit: "cover",
                                   }}
                                 />
                               </td>
@@ -205,7 +225,7 @@ const DashboardCocina = () => {
           </div>
         </div>
       ) : (
-        <div className="card mb-4"> 
+        <div className="card mb-4">
           <div className="card-header text-center bg-primary text-white">
             <h5>Productos en el Menu</h5>
           </div>
@@ -237,9 +257,9 @@ const DashboardCocina = () => {
                             src={product.image || placeholderImage}
                             alt={product.name || "Item"}
                             style={{
-                              width: "50px",      
-                              height: "30px",      
-                              objectFit: "cover",  
+                              width: "50px",
+                              height: "30px",
+                              objectFit: "cover",
                             }}
                           />
                         </td>
@@ -266,4 +286,3 @@ const DashboardCocina = () => {
 };
 
 export default DashboardCocina;
-
