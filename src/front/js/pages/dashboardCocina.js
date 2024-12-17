@@ -31,7 +31,7 @@ const DashboardCocina = () => {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      const response = await fetch(`${process.env.BACKEND_URL}/api/orders/${orderId}`, {
+      const response = await fetch(`${process.env.BACKEND_URL}api/orders/${orderId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
