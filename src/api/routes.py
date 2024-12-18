@@ -7,6 +7,7 @@ import cloudinary
 import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 import os
+from flask_socketio import SocketIO, emit
 
 
 
@@ -17,7 +18,15 @@ cloudinary.config(
     secure=True
 )
 
+# Configurar SocketIO
+socketio = SocketIO(cors_allowed_origins="*")
+
 api = Blueprint('api', __name__)
+
+# Ejemplo de emisión de evento
+@socketio.on('connect')
+def handle_connect():
+    print("🟢 Client connected via SocketIO")
 
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
@@ -171,6 +180,105 @@ def get_products():
         return jsonify({"msg": "Internal server error"}), 500
 
 
+# @api.route('/orders', methods=['POST'])
+# @jwt_required()
+# def create_order():
+#     """
+#     Create a new order for the logged-in user and return order details.
+#     """
+#     current_user_id = get_jwt_identity()  # This is now the user ID as a string
+#     user = User.query.get(current_user_id)  # Fetch the user object
+
+#     if not user:
+#         return jsonify({"msg": "User not found"}), 404
+    
+#     body = request.get_json()
+
+#     cart = body.get("cart")  # List of cart items
+#     if not isinstance(cart, list) or len(cart) == 0:
+#         return jsonify({"msg": "Cart must be a non-empty list"}), 400
+
+#     # Validate required fields
+#     if not all(isinstance(item, dict) and "product_id" in item and "quantity" in item for item in cart):
+#         return jsonify({"msg": "Each cart item must have product_id and quantity"}), 400
+
+#     # Generate a unique order number for the cart
+#     order_number = f"{user.id}-{int(datetime.now().timestamp() * 1000)}"
+
+#     try:
+#         # Create the order
+#         order = Order(
+#             user_id=user.id,
+#             order_number=order_number
+#         )
+#         db.session.add(order)
+
+#         # Prepare order details
+#         items = []
+#         total_amount = 0.0
+
+#         # Add products to the order
+#         for item in cart:
+#             product_id = item.get("product_id")
+#             quantity = item.get("quantity", 1)  # Default quantity to 1 if not provided
+
+#             # Validate product and quantity
+#             product = Product.query.get(product_id)
+#             if not product:
+#                 return jsonify({"msg": f"Product with ID {product_id} not found"}), 404
+
+#             if product.stock < quantity:
+#                 return jsonify({"msg": f"Insufficient stock for product {product_id}"}), 400
+
+#             # Deduct stock
+#             product.stock -= quantity
+
+#             # Calculate subtotal
+#             subtotal = product.price * quantity
+#             total_amount += subtotal
+
+#             # Add product details to the response
+#             items.append({
+#                 "name": product.name,
+#                 "price": product.price,
+#                 "quantity": quantity,
+#                 "subtotal": subtotal
+#             })
+
+#             # Create order-product relationship
+#             order_product = OrderProduct(
+#                 order_id=order.id,
+#                 product_id=product.id,
+#                 quantity=quantity
+#             )
+#             db.session.add(order_product)
+
+#         # Commit the transaction
+#         db.session.commit()
+
+#          # **Emitir evento de WebSocket**
+#         socketio.emit('new_order', {
+#             "msg": "New order created",
+#             "order_number": order_number,
+#             "user_id": user.id,
+#             "total": total_amount,
+#             "items": items
+#         })
+
+#         console.log(new_order)
+
+#         return jsonify({
+#             "msg": "Order created successfully",
+#             "order_number": order_number,
+#             "date": datetime.now().isoformat(),
+#             "items": items,
+#             "total": total_amount
+#         }), 201
+
+#     except Exception as e:
+#         db.session.rollback()
+#         return jsonify({"msg": f"Failed to create order: {str(e)}"}), 500
+
 @api.route('/orders', methods=['POST'])
 @jwt_required()
 def create_order():
@@ -247,17 +355,42 @@ def create_order():
         # Commit the transaction
         db.session.commit()
 
+        # **Emitir evento de WebSocket**
+        try:
+            socketio.emit('new_order', {
+                "msg": "New order created",
+                "order_number": order_number,
+                "user_id": user.id,
+                "total": total_amount,
+                "items": items
+            })
+            print(f"SocketIO emit successful for order {order_number}")
+            print("✅ new_order event emitted with payload:", {
+                    "msg": "New order created",
+                    "order_number": order_number,
+                    "user_id": user.id,
+                    "total": total_amount,
+                    "items": items
+                })
+            emit_status = "Success"
+        except Exception as e:
+            print(f"SocketIO emit failed: {str(e)}")
+            emit_status = f"Failed: {str(e)}"
+
         return jsonify({
             "msg": "Order created successfully",
             "order_number": order_number,
             "date": datetime.now().isoformat(),
             "items": items,
-            "total": total_amount
+            "total": total_amount,
+            "socketio_status": emit_status  # Nuevo control para visualizar el estado del emit
         }), 201
 
     except Exception as e:
         db.session.rollback()
+        print(f"Error creating order: {str(e)}")
         return jsonify({"msg": f"Failed to create order: {str(e)}"}), 500
+
 
 
 @api.route('/orders/<int:order_id>', methods=['PATCH'])

@@ -4,10 +4,13 @@ from flask_cors import CORS
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from api.utils import APIException, generate_sitemap
-from api.routes import api
+from api.routes import api, socketio  # Importar el socketio de routes
 from api.models import db
 from api.admin import setup_admin
 from api.commands import setup_commands
+from flask_socketio import SocketIO  # Importar SocketIO
+
+
 
 app = Flask(__name__)
 CORS(app)
@@ -27,6 +30,10 @@ MIGRATE = Migrate(app, db)
 
 # Initialize JWT Manager
 jwt = JWTManager(app)
+
+socketio.init_app(app, cors_allowed_origins="*")  # Inicializar SocketIO con la app
+print("✅ Flask-SocketIO initialized successfully")
+
 
 # Register Blueprints and Admin
 app.register_blueprint(api, url_prefix='/api')
@@ -56,4 +63,5 @@ def serve_any_other_file(path):
 # Main entry point
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
-    app.run(host='0.0.0.0', port=PORT, debug=True)
+    socketio.run(app, host='0.0.0.0', port=PORT, debug=True)
+    print(f"🚀 Server running on http://0.0.0.0:{PORT}")
