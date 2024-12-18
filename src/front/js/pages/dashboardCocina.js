@@ -1,6 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState} from "react";
 import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
+import { useCallback } from "react";
+// import io from "socket.io-client";
+
+// const { store } = useContext(FluxContext);
+// const orders = store.orders;
+
 
 const DashboardCocina = () => {
   const { store, actions } = React.useContext(Context);
@@ -9,10 +15,84 @@ const DashboardCocina = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [message, setMessage] = useState(null);
 
+
+  const handleNewOrder = useCallback((order) => {
+    // const order = order_
+    console.log("🔔 New order received in DashboardCocina:", order);
+    actions.updateOrderInStore(order);
+  }, [actions]);
+
   useEffect(() => {
+    console.log("🛠️ Initializing orders and SocketIO...");
+  
+    if (!window.socket) {
+      console.error("❌ SocketIO not initialized. Please check your connection.");
+      return;
+    }
+
+  //   const handleOrderUpdate = () => {
+  //     console.log("State updated, re-rendering DashboardCocina...");
+  //     const orders = state.store.getStore().orders;
+  //     if (actions && typeof actions.setOrder === "function") {
+  //         actions.setOrder(orders);
+  //     }
+  // };
+  
+    // Definir la función para manejar el evento 'new_order'
+    // const handleNewOrder = (order) => {
+    //   console.log("🔔 New order received in DashboardCocina:", order);
+    //   actions.updateOrderInStore(order);
+    // };
+ 
+  
+    // Configurar los listeners
     actions.getOrders();
     actions.getProducts();
+    actions.listenOrders(); // Escucha otros eventos de órdenes
+    window.socket.on("new_order", handleNewOrder);
+    
+  
+    // Cleanup al desmontar el componente
+    return () => {
+      console.log("🧹 Cleaning up 'new_order' listener...");
+      window.socket.off("new_order", handleNewOrder);
+    };
   }, []);
+  
+
+  // useEffect(() => {
+  //   console.log("🛠️ Initializing orders and SocketIO...");
+
+  //   if (!window.socket) {
+  //     console.error("❌ SocketIO not initialized. Please check your connection.");
+  //     return;
+  //   }
+  //   actions.getOrders();
+  //   actions.getProducts();
+  //   actions.listenOrders(); // Escucha eventos de 'new_order'
+
+
+  //   // Callback cuando se recibe un evento 'new_order'
+  //   window.socket.on("new_order", (order) => {
+  //     console.log("🔔 New order received in DashboardCocina:", order);
+  //     actions.updateOrderInStore(order);
+
+  //   });
+
+
+
+  //   // Cleanup al desmontar el componente
+  //   //  return () => {
+  //   //       window.socket.off("new_order", handleNewOrder);
+  //            window.socket.off("new_order", (order) => {
+  //            console.log("🔔 Cleanup: Removing 'new_order' listener.");
+  //   });
+  //   //   };
+
+
+
+  // }, []);
+
 
   const placeholderImage =
     "https://res.cloudinary.com/dnmm7omko/image/upload/v1733842727/ubstteb7dmizj50zozse.webp";
@@ -181,9 +261,9 @@ const DashboardCocina = () => {
                                   src={product.image || placeholderImage}
                                   alt={product.name || "Product"}
                                   style={{
-                                    width: "50px",       
-                                    height: "30px",      
-                                    objectFit: "cover",  
+                                    width: "50px",
+                                    height: "30px",
+                                    objectFit: "cover",
                                   }}
                                 />
                               </td>
@@ -205,7 +285,7 @@ const DashboardCocina = () => {
           </div>
         </div>
       ) : (
-        <div className="card mb-4"> 
+        <div className="card mb-4">
           <div className="card-header text-center bg-primary text-white">
             <h5>Productos en el Menu</h5>
           </div>
@@ -237,9 +317,9 @@ const DashboardCocina = () => {
                             src={product.image || placeholderImage}
                             alt={product.name || "Item"}
                             style={{
-                              width: "50px",      
-                              height: "30px",      
-                              objectFit: "cover",  
+                              width: "50px",
+                              height: "30px",
+                              objectFit: "cover",
                             }}
                           />
                         </td>
