@@ -2,8 +2,12 @@ import io from "socket.io-client";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3001";
 
-if (!window.socket) {
+// Evitamos inicializar socket múltiples veces con una variable para controlarlo
+let socketInitialized = false;
+
+if (!window.socket && !socketInitialized) {
     console.log("🟢 Initializing SocketIO...");
+    socketInitialized = true;
     window.socket = io(BACKEND_URL);
 
     window.socket.on("connect", () => {
@@ -12,6 +16,8 @@ if (!window.socket) {
 
     window.socket.on("disconnect", () => {
         console.warn("⚠️ SocketIO disconnected.");
+        // Reseteamos el estado para permitir reconexión
+        socketInitialized = false;
     });
 } else {
     console.log("ℹ️ SocketIO already initialized.");
@@ -118,11 +124,19 @@ const getState = ({ getStore, getActions, setStore }) => {
 
             // Fetch orders
             getOrders: async () => {
+                // Evitamos peticiones HTTP innecesarias
+                const store = getStore();
+                if (store.orders && store.orders.length > 0) {
+                    console.log("Using cached orders, length:", store.orders.length);
+                    return;
+                }
+                
                 try {
+                    console.log("Fetching orders from server...");
                     const data = await getActions().apiCall(process.env.BACKEND_URL + "api/orders");
                     if (data && Array.isArray(data.orders)) {
                         setStore({ orders: data.orders });
-                        console.log("Orders fetched successfully:", data.orders);
+                        console.log("Orders fetched successfully:", data.orders.length);
                     } else {
                         console.error("Unexpected response format:", data);
                         setStore({ orders: [] });
@@ -189,35 +203,9 @@ const getState = ({ getStore, getActions, setStore }) => {
             //     });
             // },
 
+            // Esta función ya no se usa desde el componente, eliminada para evitar múltiples listeners
             listenOrders: () => {
-                console.log("Checking if socket is initialized:", window.socket);
-                if (!window.socket) {
-                    console.error("SocketIO not initialized. Ensure socket is connected.");
-                    return;
-                }
-            
-                console.log("🛠️ Listening for 'new_order' events...");
-                window.socket.on('new_order', (order) => {
-                    try {
-                        console.log("🔔 New order received from server:", order);
-            
-                        // Validación de datos
-                        if (!order || typeof order !== "object") {
-                            console.error("⚠️ Invalid order format received:", order);
-                            return;
-                        }
-            
-                        const actions = getActions();
-                        if (actions && typeof actions.updateOrderInStore === "function") {
-                            console.log("Calling updateOrderInStore...");
-                            actions.updateOrderInStore(order);
-                        } else {
-                            console.error("updateOrderInStore function not found in getActions.");
-                        }
-                    } catch (error) {
-                        console.error("⚠️ Error handling 'new_order' event:", error);
-                    }
-                });
+                console.log("listenOrders is deprecated - socket listening should be done in the component");
             },
             
 
@@ -366,22 +354,38 @@ const getState = ({ getStore, getActions, setStore }) => {
                         return;
                     }
             
-                    console.log("Current Orders in Store:", store.orders);
+                    console.log("Current Orders in Store:", store.orders.length);
             
-                    // Actualizar la orden o agregarla si no existe
-                    const updatedOrders = store.orders.some(existingOrder => existingOrder.order_number === order.order_number)
-                        ? store.orders.map(existingOrder =>
-                            existingOrder.order_number === order.order_number ? order : existingOrder
-                        )
-                        : [...store.orders, order];
+                    // Encuentra si la orden ya existe
+                    const orderExists = store.orders.some(existingOrder => 
+                        existingOrder.order_number === order.order_number
+                    );
+                    
+                    let updatedOrders;
+                    
+                    if (orderExists) {
+                        // Actualiza la orden existente
+                        updatedOrders = store.orders.map(existingOrder => 
+                            existingOrder.order_number === order.order_number 
+                                ? {...order} 
+                                : existingOrder
+                        );
+                        console.log("Updating existing order");
+                    } else {
+                        // Agrega nueva orden al inicio para que aparezca primero
+                        updatedOrders = [{...order}, ...store.orders];
+                        console.log("Adding new order");
+                    }
             
-                    console.log("Updating Store with a new orders array...");
-                    setStore({
-                        ...store,
-                        orders: updatedOrders // Genera una nueva referencia
-                    });
-            
-                    console.log("✅ Store updated with new order:", updatedOrders);
+                    // Solo actualizamos si hay cambios
+                    if (orderExists || updatedOrders.length !== store.orders.length) {
+                        console.log("Updating Store with a new orders array...");
+                        setStore({
+                            ...store,
+                            orders: updatedOrders
+                        });
+                        console.log("✅ Store updated with order:", order.order_number);
+                    }
                 } catch (error) {
                     console.error("❌ Failed to update order in store:", error);
                 }
@@ -488,7 +492,9 @@ const getState = ({ getStore, getActions, setStore }) => {
                     return { success: false, message: "An error occurred while creating the order." };
                 }
             },
-            updateOrderInStore: (updatedOrder) => {
+            // Esta función se mantiene para compatibilidad con actualizaciones de órdenes por ID
+            // pero no se usa para los websockets
+            updateOrderById: (updatedOrder) => {
                 const store = getStore();
                 const updatedOrders = store.orders.map((order) =>
                     order.id === updatedOrder.id ? updatedOrder : order
@@ -497,13 +503,22 @@ const getState = ({ getStore, getActions, setStore }) => {
             },
 
             getProducts: async () => {
+                // Evitamos peticiones HTTP innecesarias
+                const store = getStore();
+                if (store.products && store.products.length > 0) {
+                    console.log("Using cached products, length:", store.products.length);
+                    return;
+                }
+                
                 try {
+                    console.log("Fetching products from server...");
                     const response = await fetch(process.env.BACKEND_URL + "api/products");
                     if (!response.ok) throw new Error("Failed to fetch products");
 
                     const data = await response.json();
                     if (Array.isArray(data.products)) {
                         setStore({ products: data.products });
+                        console.log("Products fetched successfully:", data.products.length);
                     } else {
                         console.error("Unexpected response format for products:", data);
                         setStore({ products: [] });

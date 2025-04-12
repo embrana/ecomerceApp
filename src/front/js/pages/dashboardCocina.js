@@ -11,17 +11,20 @@ import { useCallback } from "react";
 const DashboardCocina = () => {
   const { store, actions } = React.useContext(Context);
   const { orders, products } = store;
+  const [refresh, setRefresh] = useState(0); // Estado para forzar re-renders
   const [currentView, setCurrentView] = useState("orders");
   const [searchQuery, setSearchQuery] = useState("");
   const [message, setMessage] = useState(null);
   const [isDateDescending, setIsDateDescending] = useState(true); // To toggle sorting
 
 
-  const handleNewOrder = useCallback((order) => {
-    // const order = order_
+  // No usamos useCallback para evitar recreación de la función
+  const handleNewOrder = (order) => {
     console.log("🔔 New order received in DashboardCocina:", order);
     actions.updateOrderInStore(order);
-  }, [actions]);
+    // Solo incrementamos el contador para forzar la actualización
+    setRefresh(prev => prev + 1);
+  };
 
   useEffect(() => {
     console.log("🛠️ Initializing orders and SocketIO...");
@@ -30,35 +33,20 @@ const DashboardCocina = () => {
       console.error("❌ SocketIO not initialized. Please check your connection.");
       return;
     }
-
-  //   const handleOrderUpdate = () => {
-  //     console.log("State updated, re-rendering DashboardCocina...");
-  //     const orders = state.store.getStore().orders;
-  //     if (actions && typeof actions.setOrder === "function") {
-  //         actions.setOrder(orders);
-  //     }
-  // };
   
-    // Definir la función para manejar el evento 'new_order'
-    // const handleNewOrder = (order) => {
-    //   console.log("🔔 New order received in DashboardCocina:", order);
-    //   actions.updateOrderInStore(order);
-    // };
- 
-  
-    // Configurar los listeners
+    // Solo obtenemos datos al montar el componente
     actions.getOrders();
     actions.getProducts();
-    actions.listenOrders(); // Escucha otros eventos de órdenes
+    
+    // Solo configuramos el socket una vez
     window.socket.on("new_order", handleNewOrder);
     
-  
     // Cleanup al desmontar el componente
     return () => {
       console.log("🧹 Cleaning up 'new_order' listener...");
       window.socket.off("new_order", handleNewOrder);
     };
-  }, []);
+  }, []); // Vacío para que solo se ejecute al montar el componente
   
 
   // useEffect(() => {
@@ -106,6 +94,11 @@ const DashboardCocina = () => {
     ).toFixed(2);
   };
 
+  // Solo log cuando orders cambia, pero no forzamos re-render adicional
+  useEffect(() => {
+    console.log("Orders array reference changed, length:", orders.length);
+  }, [orders]);
+
   // Filter and sort orders
   const filteredOrders = orders
     .filter((order) =>
@@ -135,6 +128,8 @@ const DashboardCocina = () => {
 
       const updatedOrder = await response.json();
       actions.updateOrderInStore(updatedOrder);
+      // Forzamos actualización después de cambiar el status
+      setRefresh(prev => prev + 1);
       setMessage({ type: "success", text: "Order status updated successfully." });
     } catch (error) {
       console.error("Error updating order status:", error);
@@ -347,7 +342,11 @@ const DashboardCocina = () => {
                           <button
                             className={`btn btn-sm ${product.is_active ? "btn-success" : "btn-secondary"}`}
                             type="button"
-                            onClick={() => actions.toggleProductActive(product.id)}
+                            onClick={() => {
+                              actions.toggleProductActive(product.id);
+                              // Forzamos actualización local después de cambiar estado
+                              setRefresh(prev => prev + 1);
+                            }}
                           >
                             {product.is_active ? "Activo" : "Inactivo"}
                           </button>
