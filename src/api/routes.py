@@ -357,21 +357,29 @@ def create_order():
 
         # **Emitir evento de WebSocket**
         try:
-            socketio.emit('new_order', {
+            # Crea un objeto de orden completo para enviar al cliente
+            order_payload = {
+                "id": order.id,
                 "msg": "New order created",
                 "order_number": order_number,
                 "user_id": user.id,
                 "total": total_amount,
-                "items": items
-            })
+                "items": items,
+                "products": [
+                    {
+                        "name": item["name"],
+                        "price": item["price"],
+                        "quantity": item["quantity"],
+                        "image": Product.query.get(cart[i]["product_id"]).image if i < len(cart) else None,
+                    } for i, item in enumerate(items)
+                ],
+                "date": datetime.now().isoformat(),
+                "status": "Pendiente"
+            }
+            
+            socketio.emit('new_order', order_payload)
             print(f"SocketIO emit successful for order {order_number}")
-            print("✅ new_order event emitted with payload:", {
-                    "msg": "New order created",
-                    "order_number": order_number,
-                    "user_id": user.id,
-                    "total": total_amount,
-                    "items": items
-                })
+            print("✅ new_order event emitted with payload:", order_payload)
             emit_status = "Success"
         except Exception as e:
             print(f"SocketIO emit failed: {str(e)}")
