@@ -35,8 +35,19 @@ socketio.init_app(app, cors_allowed_origins="*")  # Inicializar SocketIO con la 
 print("✅ Flask-SocketIO initialized successfully")
 
 
+# Import the tables blueprint
+try:
+    from api.tables_routes import tables_bp
+    has_tables_bp = True
+except ImportError:
+    has_tables_bp = False
+
 # Register Blueprints and Admin
 app.register_blueprint(api, url_prefix='/api')
+
+# Register the tables blueprint if available
+if has_tables_bp:
+    app.register_blueprint(tables_bp, url_prefix='/api/tables_debug')
 setup_admin(app)
 setup_commands(app)
 

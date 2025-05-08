@@ -1,5 +1,5 @@
 from flask import request, jsonify, Blueprint
-from api.models import db, User, Product, Order, OrderProduct, Reserve
+from api.models import db, User, Product, Order, OrderProduct, Reserve, Table
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from api.utils import APIException
 from datetime import datetime, timezone
@@ -54,7 +54,9 @@ def login():
 
     if user and user.password == password:  # Password should ideally be hashed
         # Determine the redirect route based on user role
-        if user.is_cliente:
+        if user.is_waiter:
+            redirect_url = '/waiter/tables'
+        elif user.is_cliente:
             redirect_url = '/menu'
         elif user.is_cocina:
             redirect_url = '/dashboard/cocina'
@@ -67,7 +69,23 @@ def login():
         access_token = create_access_token(identity=str(user.id))
 
         # Respond with the token and redirect URL
-        return jsonify({"token": access_token, "redirect_url": redirect_url, "user_type" : user.is_cocina}), 200
+        return jsonify({
+            "token": access_token, 
+            "redirect_url": redirect_url, 
+            "user_type" : user.is_cocina,
+            "is_waiter": user.is_waiter,
+            "is_admin": user.is_admin,
+            "user_info": {
+                "id": user.id,
+                "email": user.email,
+                "roles": {
+                    "cliente": user.is_cliente,
+                    "cocina": user.is_cocina,
+                    "admin": user.is_admin,
+                    "waiter": user.is_waiter
+                }
+            }
+        }), 200
 
     # Handle invalid credentials
     return jsonify({"msg": "Invalid email or password"}), 401
@@ -534,4 +552,342 @@ def delete_reserves(id):
     except Exception as e:
         # Handle any unexpected errors
         print(f"Error deleting reservation: {e}")
+        return jsonify({"msg": "Internal server error"}), 500
+
+# Table Management Endpoints
+
+@api.route('/tables', methods=['GET'])
+def get_tables():
+    """
+    Retrieve all tables with their status and active orders
+    """
+    try:
+        tables = Table.query.all()
+        # Usar serialización manual para evitar posibles errores
+        tables_serialized = []
+        for table in tables:
+            try:
+                # Intentar obtener order activa manualmente para evitar errores
+                active_order = None
+                try:
+                    from sqlalchemy import and_
+                    order = db.session.query(Order).filter(
+                        and_(
+                            Order.table_id == table.id,
+                            Order.is_open == True
+                        )
+                    ).first()
+                    
+                    if order:
+                        active_order = {
+                            "id": order.id,
+                            "order_number": order.order_number,
+                            "status": order.status,
+                            "date": order.date.isoformat(),
+                            "is_open": order.is_open
+                        }
+                except Exception as order_err:
+                    print(f"Error getting active order for table {table.id}: {order_err}")
+                    active_order = None
+                
+                # Serializar tabla manualmente
+                table_data = {
+                    "id": table.id,
+                    "number": table.number,
+                    "name": table.name,
+                    "capacity": table.capacity,
+                    "is_occupied": table.is_occupied,
+                    "active_order": active_order
+                }
+                tables_serialized.append(table_data)
+            except Exception as table_err:
+                print(f"Error serializing table {table.id}: {table_err}")
+                # Añadir versión simplificada para evitar perder datos
+                tables_serialized.append({
+                    "id": table.id,
+                    "number": table.number,
+                    "error": "Error processing this table"
+                })
+        
+        return jsonify({"tables": tables_serialized}), 200
+    except Exception as e:
+        print(f"Error fetching tables: {e}")
+        return jsonify({"msg": f"Internal server error: {str(e)}"}), 500
+
+@api.route('/tables', methods=['POST'])
+@jwt_required()
+def create_table():
+    """
+    Create a new table (admin/manager only)
+    """
+    try:
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
+        
+        if not user or not (user.is_admin or user.is_waiter):
+            return jsonify({"msg": "Unauthorized access: only admin or waiter can create tables"}), 403
+        
+        body = request.get_json()
+        
+        if not body or "number" not in body:
+            return jsonify({"msg": "Table number is required"}), 400
+        
+        table_number = body.get("number")
+        name = body.get("name", f"Table {table_number}")
+        capacity = body.get("capacity", 4)
+        
+        # Check if table number already exists
+        existing_table = Table.query.filter_by(number=table_number).first()
+        if existing_table:
+            return jsonify({"msg": f"Table number {table_number} already exists"}), 409
+        
+        # Create new table
+        new_table = Table(
+            number=table_number,
+            name=name,
+            capacity=capacity,
+            is_occupied=False
+        )
+        
+        db.session.add(new_table)
+        db.session.commit()
+        
+        return jsonify({"msg": "Table created successfully", "table": new_table.serialize()}), 201
+    
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error creating table: {e}")
+        return jsonify({"msg": f"Failed to create table: {str(e)}"}), 500
+
+@api.route('/tables/<int:table_id>/orders', methods=['POST'])
+@jwt_required()
+def create_table_order(table_id):
+    """
+    Create a new order for a specific table
+    """
+    try:
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
+        
+        if not user:
+            return jsonify({"msg": "User not found"}), 404
+        
+        # Check if table exists
+        table = Table.query.get(table_id)
+        if not table:
+            return jsonify({"msg": f"Table with ID {table_id} not found"}), 404
+        
+        body = request.get_json()
+        cart = body.get("cart")  # List of cart items
+        
+        if not isinstance(cart, list) or len(cart) == 0:
+            return jsonify({"msg": "Cart must be a non-empty list"}), 400
+        
+        # Validate required fields
+        if not all(isinstance(item, dict) and "product_id" in item and "quantity" in item for item in cart):
+            return jsonify({"msg": "Each cart item must have product_id and quantity"}), 400
+        
+        # Find existing open order for this table or create a new one
+        existing_order = Order.query.filter(
+            Order.table_id == table_id,
+            Order.is_open == True
+        ).first()
+        
+        if existing_order:
+            order = existing_order
+            order_created = False
+        else:
+            # Generate a unique order number for the new order
+            order_number = f"T{table_id}-{int(datetime.now().timestamp() * 1000)}"
+            
+            # Create new order for this table
+            order = Order(
+                user_id=user.id,
+                table_id=table_id,
+                order_number=order_number,
+                is_open=True,
+                status="Pending"
+            )
+            db.session.add(order)
+            order_created = True
+        
+        # Prepare items to add/update
+        items = []
+        total_amount = 0.0
+        
+        # Add products to the order
+        for item in cart:
+            product_id = item.get("product_id")
+            quantity = item.get("quantity", 1)
+            
+            # Validate product and quantity
+            product = Product.query.get(product_id)
+            if not product:
+                return jsonify({"msg": f"Product with ID {product_id} not found"}), 404
+            
+            if product.stock < quantity:
+                return jsonify({"msg": f"Insufficient stock for product {product_id}"}), 400
+            
+            # Deduct stock
+            product.stock -= quantity
+            
+            # Check if product is already in the order
+            existing_item = OrderProduct.query.filter_by(
+                order_id=order.id, 
+                product_id=product_id
+            ).first()
+            
+            if existing_item:
+                # Update quantity
+                existing_item.quantity += quantity
+                # Update added_at timestamp if needed
+                # existing_item.added_at = datetime.utcnow()
+            else:
+                # Create new order-product relationship
+                order_product = OrderProduct(
+                    order_id=order.id,
+                    product_id=product_id,
+                    quantity=quantity
+                )
+                db.session.add(order_product)
+            
+            # Calculate subtotal
+            subtotal = product.price * quantity
+            total_amount += subtotal
+            
+            # Add product details to the response
+            items.append({
+                "name": product.name,
+                "price": product.price,
+                "quantity": quantity,
+                "subtotal": subtotal
+            })
+        
+        # Update table status
+        table.is_occupied = True
+        
+        # Commit the transaction
+        db.session.commit()
+        
+        # Prepare order payload for socket emission
+        order_payload = {
+            "id": order.id,
+            "msg": "Order updated" if not order_created else "New order created",
+            "order_number": order.order_number,
+            "user_id": user.id,
+            "table_id": table_id,
+            "table_number": table.number,
+            "total": total_amount,
+            "items": items,
+            "products": [
+                {
+                    "name": item["name"],
+                    "price": item["price"],
+                    "quantity": item["quantity"],
+                    "image": Product.query.get(cart[i]["product_id"]).image if i < len(cart) else None,
+                } for i, item in enumerate(items)
+            ],
+            "date": datetime.now().isoformat(),
+            "status": order.status,
+            "is_open": order.is_open
+        }
+        
+        # Emit socket event
+        try:
+            socketio.emit('new_order', order_payload)
+            print(f"SocketIO emit successful for order {order.order_number}")
+            emit_status = "Success"
+        except Exception as e:
+            print(f"SocketIO emit failed: {str(e)}")
+            emit_status = f"Failed: {str(e)}"
+        
+        return jsonify({
+            "msg": "Order updated successfully" if not order_created else "Order created successfully",
+            "order_number": order.order_number,
+            "date": datetime.now().isoformat(),
+            "items": items,
+            "total": total_amount,
+            "table": table.serialize(),
+            "socketio_status": emit_status
+        }), 200
+    
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error processing table order: {e}")
+        return jsonify({"msg": f"Failed to process order: {str(e)}"}), 500
+
+@api.route('/tables/<int:table_id>/orders', methods=['GET'])
+def get_table_orders(table_id):
+    """
+    Get all orders for a specific table
+    """
+    try:
+        # Check if table exists
+        table = Table.query.get(table_id)
+        if not table:
+            return jsonify({"msg": f"Table with ID {table_id} not found"}), 404
+        
+        # Get all orders for this table
+        orders = Order.query.filter_by(table_id=table_id).order_by(Order.date.desc()).all()
+        
+        if not orders:
+            return jsonify({"msg": "No orders found for this table", "orders": []}), 200
+        
+        orders_serialized = [order.serialize() for order in orders]
+        
+        return jsonify({
+            "table": table.serialize(),
+            "orders": orders_serialized
+        }), 200
+    
+    except Exception as e:
+        print(f"Error fetching table orders: {e}")
+        return jsonify({"msg": "Internal server error"}), 500
+
+@api.route('/tables/<int:table_id>/close', methods=['PATCH'])
+@jwt_required()
+def close_table_order(table_id):
+    """
+    Close the active order for a table
+    """
+    try:
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
+        
+        if not user:
+            return jsonify({"msg": "User not found"}), 404
+        
+        # Check if table exists
+        table = Table.query.get(table_id)
+        if not table:
+            return jsonify({"msg": f"Table with ID {table_id} not found"}), 404
+        
+        # Find open order for this table
+        active_order = Order.query.filter(
+            Order.table_id == table_id,
+            Order.is_open == True
+        ).first()
+        
+        if not active_order:
+            return jsonify({"msg": "No active order found for this table"}), 404
+        
+        # Update order status
+        active_order.is_open = False
+        active_order.status = "Completed"
+        
+        # Update table status
+        table.is_occupied = False
+        
+        # Commit changes
+        db.session.commit()
+        
+        return jsonify({
+            "msg": "Order closed successfully",
+            "order": active_order.serialize(),
+            "table": table.serialize()
+        }), 200
+    
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error closing table order: {e}")
         return jsonify({"msg": "Internal server error"}), 500

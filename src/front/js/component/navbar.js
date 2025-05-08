@@ -9,6 +9,7 @@ export const Navbar = () => {
     const [isSmallScreen, setIsSmallScreen] = useState(false);
 
     const isLoggedIn = store.token || sessionStorage.getItem("auth_token");
+    const isWaiter = store.is_waiter || sessionStorage.getItem("is_waiter") === "true";
 
     const navigate = useNavigate();
     
@@ -85,6 +86,20 @@ return (
                                             {store.user_type && <Link to="/dashboard/cocina" className="text-decoration-none">
                                                 <button className="btn btn-light w-100">Cocina Pedidos</button>
                                             </Link>}
+                                        {isWaiter && (
+                                            <>
+                                                <li>
+                                                    <Link to="/waiter/tables">
+                                                        <button className="btn btn-light w-100">Tables</button>
+                                                    </Link>
+                                                </li>
+                                                <li>
+                                                    <Link to="/waiter/dashboard">
+                                                        <button className="btn btn-light w-100">Orders Dashboard</button>
+                                                    </Link>
+                                                </li>
+                                            </>
+                                        )}
                                         </li>
                                         <li className="dropdown-item">
                                             <button
@@ -122,8 +137,18 @@ return (
                                     <button className="btn btn-light me-2">Comedor</button>
                                 </Link>
                                 {store.user_type && <Link to="/dashboard/cocina" className="text-decoration-none me-2">
-                                                <button className="btn btn-light w-100">Cocina Pedidos</button>
-                                            </Link>}          
+                                                <button className="btn btn-light">Cocina Pedidos</button>
+                                            </Link>}
+                                {isWaiter && (
+                                    <>
+                                        <Link to="/waiter/tables" className="me-2">
+                                            <button className="btn btn-light">Tables</button>
+                                        </Link>
+                                        <Link to="/waiter/dashboard" className="me-2">
+                                            <button className="btn btn-light">Orders Dashboard</button>
+                                        </Link>
+                                    </>
+                                )}
                                 <button
                                     className="btn btn-danger"
                                     onClick={() => actions.logout()}

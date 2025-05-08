@@ -17,6 +17,9 @@ import AddMenu from "./pages/addMenu";
 import EditMenu from "./pages/editMenu";
 import Menu from "./pages/menu";
 import Reserve from "./pages/reserve";
+import WaiterTables from "./pages/waiterTables";
+import WaiterTableDetail from "./pages/waiterTableDetail";
+import WaiterDashboard from "./pages/waiterDashboard";
 
 import { CheckOut } from "./pages/checkout";
 
@@ -47,6 +50,21 @@ const Layout = () => {
                         <Route path="/dashboard/cocina" element={
                             <ProtectedRoute>
                                 <DashboardCocina />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/waiter/tables" element={
+                            <ProtectedRoute>
+                                <WaiterTables />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/waiter/tables/:tableId" element={
+                            <ProtectedRoute>
+                                <WaiterTableDetail />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/waiter/dashboard" element={
+                            <ProtectedRoute>
+                                <WaiterDashboard />
                             </ProtectedRoute>
                         } />
                         <Route path="/add/menu" element={
